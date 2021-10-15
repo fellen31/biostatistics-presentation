@@ -13,7 +13,7 @@
 class: center, middle, inverse, title-slide
 
 # Introduction to biostatistics
-## Group 2B
+## Problem 2
 ### Felix Lenner, Johnny Pellas &amp; Xue Yu
 ### 2021-10-15
 
@@ -22,30 +22,67 @@ class: center, middle, inverse, title-slide
 
 
 
-# First slide
+# Presentation of research question 
 
-- example
-
-- example
+&gt; "A randomized trial evaluated a new therapy program designed to help patients recover from a stroke, comparing it to a standard program. Patients were evaluated at baseline (week 0), and for 7 consecutive weeks, using the Barthelindex. This score ranges from 0 to 100, higher scores indicating better functional ability".
 
 ---
 
-# Second slide
+# Data description 
+
+- How many individuals are there in the data set? 
+
+- Summarize the variables using suitable tables and/or diagrams.
+
+&gt; "The impression is that both groups start at similar levels (how does this relate to randomization?), and gradually increase, but that the experimental group climbs faster. In a linear regression model, this corresponds to two separate slopes, which can be captured by an interaction term."
+
+---
+
+# Statistical analysis
+
+- Which analysis method did you choose? 
+
+- Why? (This should be discussed even if the exam prescribes a certain analysis.) 
+
+- Explain why you think your chosen analysis is reasonable.
+
+- When presenting your results, tell the audience which number(s) you consider most important, and what they mean. Interpret your results in ordinary language.
+
+&gt; "Analyze the data using multiple linear regression with the following predictors: Group, week, and a group x week interaction term. How to include interaction terms depends on the statistical software."
+
+&gt; "You should get 4 estimated regression coefficients, including the intercept. What do they mean? Which one tells us most about the new program? Does it seem promising?"
+
+&gt; "Bonus question: The assumption of independent measurements is violated in this example. Why? Is this a serious problem? Can you think of an alternative analysis that overcomes this problem? What results does it give?"
+
+---
+
+# Conclusions and discussion
+
+- What results did you get?
+
+- How do you interpret them?
+
+- What biological conclusions do you draw?
+
+- Keep the presentation concise. It should take no longer than 15 minutes, followed by approximately 10 minutes discussion.
+
+---
+
+# Example slide
 
 
 ```r
 data %&gt;%
   ggplot(aes(week, score, group = week, fill = group)) + 
   geom_boxplot() +
-  facet_wrap(~ group)
+  facet_wrap( ~ group)
 ```
 
 ![](biostatistics-presentation_files/figure-html/unnamed-chunk-1-1.png)&lt;!-- --&gt;
 
-
 ---
 
-# Third slide
+# Example slide
 
 ![](biostatistics-presentation_files/figure-html/unnamed-chunk-2-1.png)&lt;!-- --&gt;
     </textarea>
