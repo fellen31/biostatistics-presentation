@@ -1,0 +1,61 @@
+---
+title: "Introduction to biostatistics"
+subtitle: "Group 2B"
+author: "Felix Lenner, Johnny Pellas & Xue Yu"
+date: "`r Sys.Date()`"
+output:
+  xaringan::moon_reader:
+    lib_dir: libs
+    nature:
+      ratio: '16:9'
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+```{r setup, include=FALSE}
+# Set working directory
+knitr::opts_knit$set(root.dir = '~/biostatistics-presentation')
+
+options(htmltools.dir.version = FALSE)
+
+library(tidyverse)
+
+data <- read_tsv("data/problem2_data.txt")
+
+data <- data %>%
+  mutate(group = factor(group, levels = c('Std', 'Exp')))
+
+```
+
+# First slide
+
+- example
+
+- example
+
+---
+
+# Second slide
+
+```{r, fig.width=14,fig.height=5, dev='png'}
+
+data %>%
+  ggplot(aes(week, score, group = week, fill = group)) + 
+  geom_boxplot() +
+  facet_wrap(~ group)
+
+```
+
+
+---
+
+# Third slide
+
+```{r, echo=F, fig.width=14,fig.height=5, dev='png'}
+data %>%
+  ggplot(aes(week, score, group = id, color = factor(id))) +
+  geom_line() + 
+  facet_wrap(~group)
+```
+
