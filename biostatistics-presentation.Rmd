@@ -38,7 +38,7 @@ data <- data %>%
 
 # Second slide
 
-```{r, fig.width=14,fig.height=5, dev='png'}
+```{r, fig.width=14,fig.height=5, dev='png', dpi=300}
 
 data %>%
   ggplot(aes(week, score, group = week, fill = group)) + 
@@ -52,7 +52,7 @@ data %>%
 
 # Third slide
 
-```{r, echo=F, fig.width=14,fig.height=5, dev='png'}
+```{r, echo=F, fig.width=14,fig.height=5, dev='png', dpi=300}
 data %>%
   ggplot(aes(week, score, group = id, color = factor(id))) +
   geom_line() + 
