@@ -18,6 +18,7 @@ problem_3_data_recoded <- problem_3_data %>%
                        D3 = "125",
                        D4 = "250")) %>%
   select(Dose, Response) 
+
 ```
 
 > What can we say about the teratogenicityofdiEGdiME to developing fetuses?
