@@ -15,12 +15,14 @@ output:
 
 ```{r setup, include=FALSE}
 # Set working directory
-knitr::opts_knit$set(root.dir = '~/biostatistics-presentation')
-setwd('~/biostatistics-presentation')
+knitr::opts_knit$set(root.dir = '~/Projects/biostatistics-presentation')
+setwd('~/Projects/biostatistics-presentation')
 
 options(htmltools.dir.version = FALSE)
 
-library(tidyverse)
+require(tidyverse)
+require(broom)
+require(ggfortify)
 
 data <- read_tsv("data/problem2_data.txt")
 
@@ -39,7 +41,35 @@ data <- data %>%
 
 - How many individuals are there in the data set? 
 
+```{r}
+data %>% distinct(id) %>% nrow()
+```
+
+
 - Summarize the variables using suitable tables and/or diagrams.
+
+```{r}
+data %>%
+  ggplot(aes(week, score, group = week, fill = group)) + 
+  geom_boxplot() +
+  facet_wrap(~group)
+```
+
+```{r}
+data %>%
+  ggplot(aes(week, score, color = factor(id))) +
+  geom_line() +
+  facet_wrap(~group)
+```
+```{r}
+data_no_outlier <- data %>% filter(id !=5)
+
+data_no_outlier %>%
+  ggplot(aes(week, score, group = week, fill = group)) + 
+  geom_boxplot() +
+  facet_wrap(~group)
+```
+
 
 > "The impression is that both groups start at similar levels (how does this relate to randomization?), and gradually increase, but that the experimental group climbs faster. In a linear regression model, this corresponds to two separate slopes, which can be captured by an interaction term."
 
@@ -49,6 +79,18 @@ data <- data %>%
 
 - Which analysis method did you choose? 
 
+```{r}
+# We chose linear regression (as prescribed by the exam)
+```
+
+
+```{r}
+# "When to prefer regression:
+#   - If you are interested in the line itself (e.g. the slope), use regression.
+
+```
+
+
 - Why? (This should be discussed even if the exam prescribes a certain analysis.) 
 
 - Explain why you think your chosen analysis is reasonable.
@@ -57,9 +99,136 @@ data <- data %>%
 
 > "Analyze the data using multiple linear regression with the following predictors: Group, week, and a group x week interaction term. How to include interaction terms depends on the statistical software."
 
+
+```{r}
+
+full <- lm(score ~ group + week + group * week, data_no_outlier)
+summary(full)
+```
+
 > "You should get 4 estimated regression coefficients, including the intercept. What do they mean? Which one tells us most about the new program? Does it seem promising?"
 
+```{r}
+data_no_outlier %>%
+  ggplot(aes(week, score, color = group)) +
+  geom_point(alpha = 0.5) +
+  stat_smooth(method = "lm", formula = y ~ x)
+
+autoplot(full)
+```
+
+```{r}
+regression <-lm(data = data_no_outlier, score ~ group + week + group * week)
+
+summary(regression)
+
+data_no_outlier %>%
+  filter(group == "Std") %>%
+  lm(score ~ week, data = .)
+
+# Intercept: The mean score at week 0 is 32.76, but how does it relate to the different groups? 
+
+# On average, the score increases 5.68 +- 0.72 (?) for each week. 
+
+```
+
 > "Bonus question: The assumption of independent measurements is violated in this example. Why? Is this a serious problem? Can you think of an alternative analysis that overcomes this problem? What results does it give?"
+
+```{r, comment="#"}
+# Model assumptions
+# "The exact formulation of the linear regression model is:
+#   - Linear relationship between x and y
+#   - Independent measurements
+#   - Normally distributed residuals
+#   - Equal SD sigma for the residuals. 
+    
+# Checking model assumptions
+#   - Checking normality
+#     - The model assumes the residuals to be normal (not x or y)
+#     - After computing these, normality can be checked
+#         - Graphically, e.g. histogram, Q-Q plot
+#         - Numerically, e.g. the Shapiro-Wilk test.
+
+augment(group_week) %>%
+  ggplot(aes(.resid, fill = group)) + 
+  geom_histogram(binwidth = 5, position = "identity", alpha = 0.7)
+
+autoplot(group_week)[2]
+
+augment(group_week) %>% pull(.resid) %>% shapiro.test()
+
+#   - The independence assumption
+#     - Independence is a question of study design.
+#     - The dependent values (y) should be samples individually, not in groups. 
+#     - Equivalently: Each row in the database should be independent of other rows (OK to measure x and y on the same person).
+#     - Example of non-independence:
+#       - Longitudinal studies (several values from the same individual)
+#       - Cluster sampling.
+#       - Paired data
+#   - Dependent data
+#     - If the study design violates independence, this _must_ be handled statistically. 
+#     - Some possibilities (Chapters 41 - 42):
+#       - Combine the dependent values into a single one, e.g. an average or difference. (Like the paired t-test ?)
+
+t_test <- data_no_outlier %>% 
+  group_by(id) %>%
+  mutate(score_7 = score[which(week==7)], score_0 = score[which(week==0)]) %>%
+  select(id, group, score_0, score_7) %>% distinct() %>%
+  pivot_longer(c(score_0, score_7), names_to = "week", values_to = "score")
+
+# Not right?
+t.test(score ~ week, data = t_test, paired = TRUE)
+
+#       - Use robust standard errors. 
+#       - Model the dependence, using a random effects model. 
+
+# Categorical x variables
+#   - One often has categorical variables in the data set.
+#   - Can we add suck variables to the model? Yes, using dummy variables.
+#   - For a dichotomous variable, such as gender, there is only one dummy variable:
+#     - B tells how much larger y is for (1) than for (0)
+
+# Smoking example, numerical data in two groups
+#   - Could use t-test
+#   - Try linear regression with a single variable (smoking) instead!
+#   - (This is actually the same thing, as we shall see).
+
+data_no_outlier %>%
+  ggplot(aes(group, score)) +
+  geom_boxplot()
+
+lm(score ~ group, data_no_outlier)
+
+# Would we like to compare groups for each week? Not really, the important part I guess is the end result (or difference between start and end).
+
+data_no_outlier %>%
+  ggplot(aes(week, score, color = group)) +
+  geom_jitter(width = 0.2, height = 0, alpha = 0.5)
+
+lm(score ~ group + week, data_no_outlier)
+
+# Interaction
+#   - Implicit assumption: The effect of smoking is the same for all ages.
+#   - Corresponds to parallel lines.
+#   - Couldn't we imagine non-parallel lines, e.g. impaired development for smokers?
+#   - Sure! If we wish to study that, we must modify the model, adding an interaction term:
+#   - Corresponds to an extras slope for smokers...
+
+glm(score ~ week + group + week * group, data_no_outlier, family = "gaussian") 
+
+lm(score ~ week + group + week * group, data_no_outlier)
+
+#   - When including an interaction, the main effects should also be in the model.
+
+autoplot(full)
+
+data_no_outlier %>%
+  ggplot(aes(week, score, color = group)) +
+  geom_point() + 
+  geom_smooth(method = lm, se = FALSE, formula = y ~ x)
+```
+
+
 
 ---
 
@@ -82,7 +251,7 @@ data <- data %>%
 data %>%
   ggplot(aes(week, score, group = week, fill = group)) + 
   geom_boxplot() +
-  facet_wrap( ~ group)
+  facet_wrap(~ group)
 
 ```
 
@@ -97,5 +266,14 @@ data %>%
   geom_line() + 
   facet_wrap(~group)
 
+```
+
+```{r}
+diff <- data_no_outlier %>%
+  group_by(id) %>%
+  mutate(diff = score[which(week==7)] - score[which(week==0)]) %>%
+  select(id, group, diff)
+
+diff
 ```
 

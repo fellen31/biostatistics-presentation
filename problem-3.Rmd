@@ -1,0 +1,66 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+> An animal study was conducted to assess the teratogenicityof Diethylene glycol dimethyl ether (diEGdiME), an industrial solvent used in the manufacture of protective coatings. Pregnant mice were randomized to one of four doses given daily during 10 days early in the pregnancy. Two days later, the offspring was examined for defects.
+
+```{r}
+problem_3_data <- read_tsv("data/problem3_data.txt", col_types = "ff")
+
+problem_3_data_recoded <- problem_3_data %>%
+  mutate(Response = recode(resp, 
+                           R1 = "Normal",
+                           R2 = "Malformation",
+                           R3 = "Dead"),
+         Dose = recode(dose, 
+                       D1 = "0",
+                       D2 = "62.5",
+                       D3 = "125",
+                       D4 = "250")) %>%
+  select(Dose, Response) 
+```
+
+> What can we say about the teratogenicityofdiEGdiME to developing fetuses?
+
+```{r}
+problem_3_data_recoded %>%
+  group_by(Dose, Response) %>%
+  count() %>%
+  ggplot(aes(Dose, n, fill = Response)) + 
+  geom_col(position = "fill") + 
+  ylab("Response (%)")
+```
+
+```{r}
+
+matrix <- problem_3_data_recoded %>%
+  count(Dose, Response) %>% 
+  pivot_wider(names_from = "Dose", values_from = "n") %>%
+  data.matrix(rownames.force = NA) 
+
+rownames(matrix) = matrix[,1]
+
+matrix <- matrix[,-1]
+
+t(matrix)
+
+chisq.test(matrix, simulate.p.value = TRUE)
+
+```
+
+
+> Bonus question: This data set can be analyzed in several ways. Can you think of one that doesn’t simplify the data (e.g. by dichotomizing variables)? What are the pros and cons of such a method? Hint: Ordinal variables.
+
+```{r}
+
+problem_3_data_recoded %>%
+  group_by(Dose, Response) %>%
+  count() %>% 
+  ungroup() %>%
+  group_by(Dose) %>%
+  mutate(p = n / sum(n)) %>%
+  ggplot(aes(Dose, p, fill = Response)) + 
+  geom_col(position = "dodge")
+
+```
+
