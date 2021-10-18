@@ -31,11 +31,38 @@ class: center, middle, inverse, title-slide
 
 # Data description 
 
-- How many individuals are there in the data set? 
+&gt; How many individuals are there in the data set? 
 
 
+```
+## [1] 16
+```
 
-- Summarize the variables using suitable tables and/or diagrams.
+&gt; Summarize the variables using suitable tables and/or diagrams.
+
+![](biostatistics-presentation_files/figure-html/unnamed-chunk-2-1.png)&lt;!-- --&gt;
+---
+# Individual data
+
+
+```r
+data %&gt;%
+  ggplot(aes(week, score, color = factor(id))) +
+  geom_line() +
+  facet_wrap(~group)
+```
+
+![](biostatistics-presentation_files/figure-html/unnamed-chunk-3-1.png)&lt;!-- --&gt;
+---
+
+# Remove outlier (?)
+
+
+```r
+data_no_outlier &lt;- data %&gt;% filter(id !=5)
+```
+
+![](biostatistics-presentation_files/figure-html/unnamed-chunk-5-1.png)&lt;!-- --&gt;
 
 &gt; "The impression is that both groups start at similar levels (how does this relate to randomization?), and gradually increase, but that the experimental group climbs faster. In a linear regression model, this corresponds to two separate slopes, which can be captured by an interaction term."
 
@@ -43,19 +70,325 @@ class: center, middle, inverse, title-slide
 
 # Statistical analysis
 
-- Which analysis method did you choose? 
+&gt; Which analysis method did you choose? 
 
-- Why? (This should be discussed even if the exam prescribes a certain analysis.) 
+We chose linear regression.
 
-- Explain why you think your chosen analysis is reasonable.
 
-- When presenting your results, tell the audience which number(s) you consider most important, and what they mean. Interpret your results in ordinary language.
+```r
+# "When to prefer regression:
+#   - If you are interested in the line itself (e.g. the slope), use regression.
+```
+
+&gt; Why? (This should be discussed even if the exam prescribes a certain analysis.) 
+
+&gt; Explain why you think your chosen analysis is reasonable.
+
+&gt; When presenting your results, tell the audience which number(s) you consider most important, and what they mean. Interpret your results in ordinary language.
 
 &gt; "Analyze the data using multiple linear regression with the following predictors: Group, week, and a group x week interaction term. How to include interaction terms depends on the statistical software."
 
+---
+
+# Results
+
+
+```r
+full &lt;- lm(score ~ group + week + group * week, data_no_outlier)
+summary(full)
+```
+
+```
+## 
+## Call:
+## lm(formula = score ~ group + week + group * week, data = data_no_outlier)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -47.812  -9.252  -0.106  13.896  33.839 
+## 
+## Coefficients:
+##               Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)    37.5000     4.0999   9.147 2.37e-15 ***
+## groupExp      -10.4762     6.0016  -1.746   0.0835 .  
+## week            4.3304     0.9801   4.418 2.25e-05 ***
+## groupExp:week   2.8975     1.4347   2.020   0.0457 *  
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 17.96 on 116 degrees of freedom
+## Multiple R-squared:  0.3666,	Adjusted R-squared:  0.3502 
+## F-statistic: 22.38 on 3 and 116 DF,  p-value: 1.677e-11
+```
+
 &gt; "You should get 4 estimated regression coefficients, including the intercept. What do they mean? Which one tells us most about the new program? Does it seem promising?"
 
+
+```r
+data_no_outlier %&gt;%
+  ggplot(aes(week, score, color = group)) +
+  geom_point(alpha = 0.5) +
+  stat_smooth(method = "lm", formula = y ~ x)
+```
+
+![](biostatistics-presentation_files/figure-html/unnamed-chunk-8-1.png)&lt;!-- --&gt;
+
+```r
+autoplot(full)
+```
+
+![](biostatistics-presentation_files/figure-html/unnamed-chunk-8-2.png)&lt;!-- --&gt;
+
+
+```r
+regression &lt;-lm(data = data_no_outlier, score ~ group + week + group * week)
+
+summary(regression)
+```
+
+```
+## 
+## Call:
+## lm(formula = score ~ group + week + group * week, data = data_no_outlier)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -47.812  -9.252  -0.106  13.896  33.839 
+## 
+## Coefficients:
+##               Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)    37.5000     4.0999   9.147 2.37e-15 ***
+## groupExp      -10.4762     6.0016  -1.746   0.0835 .  
+## week            4.3304     0.9801   4.418 2.25e-05 ***
+## groupExp:week   2.8975     1.4347   2.020   0.0457 *  
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 17.96 on 116 degrees of freedom
+## Multiple R-squared:  0.3666,	Adjusted R-squared:  0.3502 
+## F-statistic: 22.38 on 3 and 116 DF,  p-value: 1.677e-11
+```
+
+```r
+data_no_outlier %&gt;%
+  filter(group == "Std") %&gt;%
+  lm(score ~ week, data = .)
+```
+
+```
+## 
+## Call:
+## lm(formula = score ~ week, data = .)
+## 
+## Coefficients:
+## (Intercept)         week  
+##       37.50         4.33
+```
+
+```r
+# Intercept: The mean score at week 0 is 32.76, but how does it relate to the different groups? 
+
+# On average, the score increases 5.68 +- 0.72 (?) for each week. 
+```
+
 &gt; "Bonus question: The assumption of independent measurements is violated in this example. Why? Is this a serious problem? Can you think of an alternative analysis that overcomes this problem? What results does it give?"
+
+
+```r
+# Model assumptions
+# "The exact formulation of the linear regression model is:
+#   - Linear relationship between x and y
+#   - Independent measurements
+#   - Normally distributed residuals
+#   - Equal SD sigma for the residuals. 
+    
+# Checking model assumptions
+#   - Checking normality
+#     - The model assumes the residuals to be normal (not x or y)
+#     - After computing these, normality can be checked
+#         - Graphically, e.g. histogram, Q-Q plot
+#         - Numerically, e.g. the Shapiro-Wilk test.
+
+augment(full) %&gt;%
+  ggplot(aes(.resid, fill = group)) + 
+  geom_histogram(binwidth = 5, position = "identity", alpha = 0.7)
+```
+
+![](biostatistics-presentation_files/figure-html/unnamed-chunk-10-1.png)&lt;!-- --&gt;
+
+```r
+autoplot(full)[2]
+```
+
+![](biostatistics-presentation_files/figure-html/unnamed-chunk-10-2.png)&lt;!-- --&gt;
+
+```r
+augment(full) %&gt;% pull(.resid) %&gt;% shapiro.test()
+```
+
+```
+# 
+# 	Shapiro-Wilk normality test
+# 
+# data:  .
+# W = 0.96765, p-value = 0.005482
+```
+
+```r
+#   - The independence assumption
+#     - Independence is a question of study design.
+#     - The dependent values (y) should be samples individually, not in groups. 
+#     - Equivalently: Each row in the database should be independent of other rows (OK to measure x and y on the same person).
+#     - Example of non-independence:
+#       - Longitudinal studies (several values from the same individual)
+#       - Cluster sampling.
+#       - Paired data
+#   - Dependent data
+#     - If the study design violates independence, this _must_ be handled statistically. 
+#     - Some possibilities (Chapters 41 - 42):
+#       - Combine the dependent values into a single one, e.g. an average or difference. (Like the paired t-test ?)
+
+t_test &lt;- data_no_outlier %&gt;% 
+  group_by(id) %&gt;%
+  mutate(score_7 = score[which(week==7)], score_0 = score[which(week==0)]) %&gt;%
+  select(id, group, score_0, score_7) %&gt;% distinct() %&gt;%
+  pivot_longer(c(score_0, score_7), names_to = "week", values_to = "score")
+
+# Not right?
+t.test(score ~ week, data = t_test, paired = TRUE)
+```
+
+```
+# 
+# 	Paired t-test
+# 
+# data:  score by week
+# t = -7.5437, df = 14, p-value = 2.695e-06
+# alternative hypothesis: true difference in means is not equal to 0
+# 95 percent confidence interval:
+#  -47.94777 -26.71890
+# sample estimates:
+# mean of the differences 
+#               -37.33333
+```
+
+```r
+#       - Use robust standard errors. 
+#       - Model the dependence, using a random effects model. 
+
+# Categorical x variables
+#   - One often has categorical variables in the data set.
+#   - Can we add suck variables to the model? Yes, using dummy variables.
+#   - For a dichotomous variable, such as gender, there is only one dummy variable:
+#     - B tells how much larger y is for (1) than for (0)
+
+# Smoking example, numerical data in two groups
+#   - Could use t-test
+#   - Try linear regression with a single variable (smoking) instead!
+#   - (This is actually the same thing, as we shall see).
+
+data_no_outlier %&gt;%
+  ggplot(aes(group, score)) +
+  geom_boxplot()
+```
+
+![](biostatistics-presentation_files/figure-html/unnamed-chunk-10-3.png)&lt;!-- --&gt;
+
+```r
+lm(score ~ group, data_no_outlier)
+```
+
+```
+# 
+# Call:
+# lm(formula = score ~ group, data = data_no_outlier)
+# 
+# Coefficients:
+# (Intercept)     groupExp  
+#     52.6562      -0.3348
+```
+
+```r
+# Would we like to compare groups for each week? Not really, the important part I guess is the end result (or difference between start and end).
+
+data_no_outlier %&gt;%
+  ggplot(aes(week, score, color = group)) +
+  geom_jitter(width = 0.2, height = 0, alpha = 0.5)
+```
+
+![](biostatistics-presentation_files/figure-html/unnamed-chunk-10-4.png)&lt;!-- --&gt;
+
+```r
+lm(score ~ group + week, data_no_outlier)
+```
+
+```
+# 
+# Call:
+# lm(formula = score ~ group + week, data = data_no_outlier)
+# 
+# Coefficients:
+# (Intercept)     groupExp         week  
+#     32.7674      -0.3348       5.6825
+```
+
+```r
+# Interaction
+#   - Implicit assumption: The effect of smoking is the same for all ages.
+#   - Corresponds to parallel lines.
+#   - Couldn't we imagine non-parallel lines, e.g. impaired development for smokers?
+#   - Sure! If we wish to study that, we must modify the model, adding an interaction term:
+#   - Corresponds to an extras slope for smokers...
+
+glm(score ~ week + group + week * group, data_no_outlier, family = "gaussian") 
+```
+
+```
+# 
+# Call:  glm(formula = score ~ week + group + week * group, family = "gaussian", 
+#     data = data_no_outlier)
+# 
+# Coefficients:
+#   (Intercept)           week       groupExp  week:groupExp  
+#        37.500          4.330        -10.476          2.898  
+# 
+# Degrees of Freedom: 119 Total (i.e. Null);  116 Residual
+# Null Deviance:	    59100 
+# Residual Deviance: 37440 	AIC: 1040
+```
+
+```r
+lm(score ~ week + group + week * group, data_no_outlier)
+```
+
+```
+# 
+# Call:
+# lm(formula = score ~ week + group + week * group, data = data_no_outlier)
+# 
+# Coefficients:
+#   (Intercept)           week       groupExp  week:groupExp  
+#        37.500          4.330        -10.476          2.898
+```
+
+```r
+#   - When including an interaction, the main effects should also be in the model.
+
+autoplot(full)
+```
+
+![](biostatistics-presentation_files/figure-html/unnamed-chunk-10-5.png)&lt;!-- --&gt;
+
+```r
+data_no_outlier %&gt;%
+  ggplot(aes(week, score, color = group)) +
+  geom_point() + 
+  geom_smooth(method = lm, se = FALSE, formula = y ~ x)
+```
+
+![](biostatistics-presentation_files/figure-html/unnamed-chunk-10-6.png)&lt;!-- --&gt;
+
+
 
 ---
 
@@ -78,16 +411,44 @@ class: center, middle, inverse, title-slide
 data %&gt;%
   ggplot(aes(week, score, group = week, fill = group)) + 
   geom_boxplot() +
-  facet_wrap( ~ group)
+  facet_wrap(~ group)
 ```
 
-![](biostatistics-presentation_files/figure-html/unnamed-chunk-1-1.png)&lt;!-- --&gt;
+![](biostatistics-presentation_files/figure-html/unnamed-chunk-11-1.png)&lt;!-- --&gt;
 
 ---
 
 # Example slide
 
-![](biostatistics-presentation_files/figure-html/unnamed-chunk-2-1.png)&lt;!-- --&gt;
+![](biostatistics-presentation_files/figure-html/unnamed-chunk-12-1.png)&lt;!-- --&gt;
+
+
+```r
+diff &lt;- data_no_outlier %&gt;%
+  group_by(id) %&gt;%
+  mutate(diff = score[which(week==7)] - score[which(week==0)]) %&gt;%
+  select(id, group, diff)
+
+diff
+```
+
+```
+## # A tibble: 120 × 3
+## # Groups:   id [15]
+##       id group  diff
+##    &lt;dbl&gt; &lt;fct&gt; &lt;dbl&gt;
+##  1     1 Exp      45
+##  2     1 Exp      45
+##  3     1 Exp      45
+##  4     1 Exp      45
+##  5     1 Exp      45
+##  6     1 Exp      45
+##  7     1 Exp      45
+##  8     1 Exp      45
+##  9     2 Exp      30
+## 10     2 Exp      30
+## # … with 110 more rows
+```
 
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>

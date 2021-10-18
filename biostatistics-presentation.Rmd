@@ -33,80 +33,88 @@ data <- data %>%
 
 # Presentation of research question 
 
-> "A randomized trial evaluated a new therapy program designed to help patients recover from a stroke, comparing it to a standard program. Patients were evaluated at baseline (week 0), and for 7 consecutive weeks, using the Barthelindex. This score ranges from 0 to 100, higher scores indicating better functional ability".
+<!-- "A randomized trial evaluated a new therapy program designed to help patients recover from a stroke, comparing it to a standard program. Patients were evaluated at baseline (week 0), and for 7 consecutive weeks, using the Barthelindex. This score ranges from 0 to 100, higher scores indicating better functional ability". -->
 
 ---
 
 # Data description 
 
-- How many individuals are there in the data set? 
+<!-- How many individuals are there in the data set?  -->
 
-```{r}
+```{r, echo=FALSE}
 data %>% distinct(id) %>% nrow()
 ```
 
+<!-- Summarize the variables using suitable tables and/or diagrams. -->
 
-- Summarize the variables using suitable tables and/or diagrams.
-
-```{r}
+```{r, echo=FALSE}
 data %>%
   ggplot(aes(week, score, group = week, fill = group)) + 
   geom_boxplot() +
   facet_wrap(~group)
 ```
 
-```{r}
+---
+
+# Individual data
+
+```{r, echo=FALSE}
 data %>%
   ggplot(aes(week, score, color = factor(id))) +
   geom_line() +
   facet_wrap(~group)
 ```
+
+---
+
+# Remove outlier (?)
+
 ```{r}
 data_no_outlier <- data %>% filter(id !=5)
+```
 
+```{r, echo=FALSE}
 data_no_outlier %>%
   ggplot(aes(week, score, group = week, fill = group)) + 
   geom_boxplot() +
   facet_wrap(~group)
 ```
 
-
-> "The impression is that both groups start at similar levels (how does this relate to randomization?), and gradually increase, but that the experimental group climbs faster. In a linear regression model, this corresponds to two separate slopes, which can be captured by an interaction term."
+<!-- "The impression is that both groups start at similar levels (how does this relate to randomization?), and gradually increase, but that the experimental group climbs faster. In a linear regression model, this corresponds to two separate slopes, which can be captured by an interaction term." -->
 
 ---
 
 # Statistical analysis
 
-- Which analysis method did you choose? 
+<!-- Which analysis method did you choose?  -->
+
+- We chose linear regression.
+
+<!-- Why? (This should be discussed even if the exam prescribes a certain analysis.)  -->
+
+- "When to prefer regression- If you are interested in the line itself (e.g. the slope), use regression?"
+
+<!-- Explain why you think your chosen analysis is reasonable. -->
+
+<!-- When presenting your results, tell the audience which number(s) you consider most important, and what they mean. Interpret your results in ordinary language. -->
+
+<!-- "Analyze the data using multiple linear regression with the following predictors: Group, week, and a group x week interaction term. How to include interaction terms depends on the statistical software." -->
+
+---
+
+# Results
 
 ```{r}
-# We chose linear regression (as prescribed by the exam)
-```
-
-
-```{r}
-# "When to prefer regression:
-#   - If you are interested in the line itself (e.g. the slope), use regression.
-
-```
-
-
-- Why? (This should be discussed even if the exam prescribes a certain analysis.) 
-
-- Explain why you think your chosen analysis is reasonable.
-
-- When presenting your results, tell the audience which number(s) you consider most important, and what they mean. Interpret your results in ordinary language.
-
-> "Analyze the data using multiple linear regression with the following predictors: Group, week, and a group x week interaction term. How to include interaction terms depends on the statistical software."
-
-
-```{r}
-
 full <- lm(score ~ group + week + group * week, data_no_outlier)
+
 summary(full)
 ```
 
-> "You should get 4 estimated regression coefficients, including the intercept. What do they mean? Which one tells us most about the new program? Does it seem promising?"
+<!-- You should get 4 estimated regression coefficients, including the intercept. What do they mean? Which one tells us most about the new program? Does it seem promising? -->
+
+---
+
+# Results continued
 
 ```{r}
 data_no_outlier %>%
@@ -149,13 +157,13 @@ data_no_outlier %>%
 #         - Graphically, e.g. histogram, Q-Q plot
 #         - Numerically, e.g. the Shapiro-Wilk test.
 
-augment(group_week) %>%
+augment(full) %>%
   ggplot(aes(.resid, fill = group)) + 
   geom_histogram(binwidth = 5, position = "identity", alpha = 0.7)
 
-autoplot(group_week)[2]
+autoplot(full)[2]
 
-augment(group_week) %>% pull(.resid) %>% shapiro.test()
+augment(full) %>% pull(.resid) %>% shapiro.test()
 
 #   - The independence assumption
 #     - Independence is a question of study design.
