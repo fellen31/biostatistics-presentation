@@ -1,6 +1,6 @@
 ---
-title: "Introduction to biostatistics"
-subtitle: "Problem 2"
+title: "Problem 2"
+subtitle: "Group 2B"
 author: "Felix Lenner, Johnny Pellas & Xue Yu"
 date: "`r Sys.Date()`"
 output:
@@ -75,12 +75,12 @@ data
 
 <b>Objective:</b> Evaluation of  a new therapy program designed to help patients recover from stroke.
 
-"A <b>randomized trial</b> evaluated a <b>new therapy program</b> designed to help patients recover from a stroke, comparing it to a standard program. 
+> "A <b>randomized trial</b> evaluated a <b>new therapy program</b> designed to help patients recover from a stroke, comparing it to a standard program. 
 
 > Patients were <b>evaluated at baseline</b> (week 0), and for <b>7 consecutive weeks</b>, using the Barthelindex. This score ranges from 0 to 100, higher scores indicating better functional ability". 
 
 ---
-# Barthel index (BI)
+# Barthel Index (BI)
 
 ![BI](images/bi.jpg)
 ---
@@ -165,6 +165,7 @@ ggboxplot(data_no_outlier, x = "Week", y = "Score", fill = "Group")
 
 - We chose multiple linear regression (as prescribed by the exam).
 
+### Why?
 - We have numerical data
 - A linear relationship between x and y
 - Two study groups 
@@ -187,25 +188,31 @@ augment(model) %>% pull(.resid) %>% shapiro.test()
 <!-- "Analyze the data using multiple linear regression with the following predictors: Group, week, and a group x week interaction term. How to include interaction terms depends on the statistical software." -->
 
 <!-- When presenting your results, tell the audience which number(s) you consider most important, and what they mean. Interpret your results in ordinary language. -->
+
+$Score = Group + Week + Group \times Week$
+
+$y = \alpha + \beta_{g}x_{g} + \beta_{w}x_{w} + \beta_{gw}x_{g}x_{w}$
+
 .pull-left[
 
-- Intercept is the value of y when all x = 0
+- Intercept: the value of y if all the x's are 0 
 
-- Median score at week 0 for the Standard group
+- GroupExperimental: 10.5 lower estimated mean score than standard group (at week 0?)
 
-### Score increase per week
+- Week: Standard group score increases 4.33/week
 
-- Standard: 4.33
+- Interaction term: Experimental group score increases with 4.3+2.89 per week
 
-- Experimental: 7.22
 ]
+
 .pull-right[
 .tiny[
-```{r}
+```{r, echo=FALSE}
 summary(model)
 ```
 ]
 ]
+
 <!-- You should get 4 estimated regression coefficients, including the intercept. What do they mean? Which one tells us most about the new program? Does it seem promising? -->
 
 ---
@@ -214,9 +221,11 @@ summary(model)
 
 .pull-left[
 
-- Intercept is the value of y when all x = 0
+### Estimated mean at week 0
 
-- Median score at week 0 for the Standard group
+- Standard: 37.5
+
+- Experimental: 27
 
 ### Score increase per week
 
@@ -263,7 +272,7 @@ data %>% filter(Week == 0) %>% summarize(mean(Score))
 ```
 ---
 
-# Comparison to including outlier
+# When including the outlier
 
 .pull-left[
 .tizy[
@@ -303,6 +312,8 @@ ggscatter(data, x = "Week", y = "Score", color = "Group", position = position_ji
 
 - Check graphically or numerically 
 
+- Shapiro-Wilk, W > 0.95 
+
 ]
 .pull-right[
 ``` {r, echo=FALSE, fig.width=6,fig.height=2, dev='png', dpi=300, warning=FALSE}
@@ -335,11 +346,11 @@ augment(model) %>% pull(.resid) %>% shapiro.test()
 
 ---
 
-# Model assumptions: Linearity & homogeneity of residuals variance
+# Model assumptions: Linearity & Homogeneity of residuals
 
 .pull-left[
 
-- Linear relationship between x and y 
+- Linear relationship between x and y (residuals should be as close to 0 as possible)
 
 - Equal SD for the residuals
 
@@ -365,8 +376,10 @@ autoplot(model, data = data_no_outlier, colour = 'Group')[c(1,3)] + theme_pubr()
  <!-- "Why? Is this a serious problem? Can you think of an alternative analysis that overcomes this problem? What results does it give?" -->
 
 - Same individual measured at 8 time points (week 0-7)
+
 - Likely to be similar for each individual (serial correlation)
--Serial correlation can be assessed with the Durbin-Watson test; 2=no correlation, below 2=positive correlation, above 2=negative correlation
+
+- Serial correlation can be assessed with the Durbin-Watson test; 2=no correlation, below 2=positive correlation, above 2=negative correlation
 
 ![durbin-watson](images/durbin-watson.png)
 
@@ -515,7 +528,7 @@ ggboxplot(data_delta_score, x = "Group", y = "score_difference", fill = "Group")
 # summary(aov(Score ~ Week + Group + Week:Group, data_no_outlier)) ?
 ```
 ---
-# Alternative analysis: longitudinal data 
+# Longitudinal data 
 
 - Repeated measures analysis of variance (repeated measures ANOVA)
  

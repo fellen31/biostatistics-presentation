@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="" xml:lang="">
   <head>
-    <title>Introduction to biostatistics</title>
+    <title>Problem 2</title>
     <meta charset="utf-8" />
     <meta name="author" content="Felix Lenner, Johnny Pellas &amp; Xue Yu" />
     <meta name="date" content="2021-10-21" />
@@ -13,8 +13,8 @@
     <textarea id="source">
 class: center, middle, inverse, title-slide
 
-# Introduction to biostatistics
-## Problem 2
+# Problem 2
+## Group 2B
 ### Felix Lenner, Johnny Pellas &amp; Xue Yu
 ### 2021-10-21
 
@@ -62,7 +62,7 @@ img, video, iframe {
 
 &lt;b&gt;Objective:&lt;/b&gt; Evaluation of  a new therapy program designed to help patients recover from stroke.
 
-"A &lt;b&gt;randomized trial&lt;/b&gt; evaluated a &lt;b&gt;new therapy program&lt;/b&gt; designed to help patients recover from a stroke, comparing it to a standard program. 
+&gt; "A &lt;b&gt;randomized trial&lt;/b&gt; evaluated a &lt;b&gt;new therapy program&lt;/b&gt; designed to help patients recover from a stroke, comparing it to a standard program. 
 
 &gt; Patients were &lt;b&gt;evaluated at baseline&lt;/b&gt; (week 0), and for &lt;b&gt;7 consecutive weeks&lt;/b&gt;, using the Barthelindex. This score ranges from 0 to 100, higher scores indicating better functional ability". 
 
@@ -120,6 +120,7 @@ img, video, iframe {
 
 - We chose multiple linear regression (as prescribed by the exam).
 
+### Why?
 - We have numerical data
 - A linear relationship between x and y
 - Two study groups 
@@ -138,24 +139,25 @@ img, video, iframe {
 &lt;!-- "Analyze the data using multiple linear regression with the following predictors: Group, week, and a group x week interaction term. How to include interaction terms depends on the statistical software." --&gt;
 
 &lt;!-- When presenting your results, tell the audience which number(s) you consider most important, and what they mean. Interpret your results in ordinary language. --&gt;
+
+`\(Score = Group + Week + Group \times Week\)`
+
+`\(y = \alpha + \beta_{g}x_{g} + \beta_{w}x_{w} + \beta_{gw}x_{g}x_{w}\)`
+
 .pull-left[
 
-- Intercept is the value of y when all x = 0
+- Intercept: the value of y if all the x's are 0 
 
-- Median score at week 0 for the Standard group
+- GroupExperimental: 10.5 lower estimated mean score than standard group (at week 0?)
 
-### Score increase per week
+- Week: Standard group score increases 4.33/week
 
-- Standard: 4.33
+- Interaction term: Experimental group score increases with 4.3+2.89 per week
 
-- Experimental: 7.22
 ]
+
 .pull-right[
 .tiny[
-
-```r
-summary(model)
-```
 
 ```
 ## 
@@ -181,6 +183,7 @@ summary(model)
 ```
 ]
 ]
+
 &lt;!-- You should get 4 estimated regression coefficients, including the intercept. What do they mean? Which one tells us most about the new program? Does it seem promising? --&gt;
 
 ---
@@ -189,9 +192,11 @@ summary(model)
 
 .pull-left[
 
-- Intercept is the value of y when all x = 0
+### Estimated mean at week 0
 
-- Median score at week 0 for the Standard group
+- Standard: 37.5
+
+- Experimental: 27
 
 ### Score increase per week
 
@@ -208,7 +213,7 @@ summary(model)
 
 ---
 
-# Comparison to including outlier
+# When including the outlier
 
 .pull-left[
 .tizy[
@@ -255,6 +260,8 @@ summary(model_outlier)
 
 - Check graphically or numerically 
 
+- Shapiro-Wilk, W &gt; 0.95 
+
 ]
 .pull-right[
 ![](biostatistics-presentation_files/figure-html/unnamed-chunk-13-1.png)&lt;!-- --&gt;
@@ -270,11 +277,11 @@ summary(model_outlier)
 
 ---
 
-# Model assumptions: Linearity &amp; homogeneity of residuals variance
+# Model assumptions: Linearity &amp; Homogeneity of residuals
 
 .pull-left[
 
-- Linear relationship between x and y 
+- Linear relationship between x and y (residuals should be as close to 0 as possible)
 
 - Equal SD for the residuals
 
@@ -296,8 +303,10 @@ summary(model_outlier)
  &lt;!-- "Why? Is this a serious problem? Can you think of an alternative analysis that overcomes this problem? What results does it give?" --&gt;
 
 - Same individual measured at 8 time points (week 0-7)
+
 - Likely to be similar for each individual (serial correlation)
--Serial correlation can be assessed with the Durbin-Watson test; 2=no correlation, below 2=positive correlation, above 2=negative correlation
+
+- Serial correlation can be assessed with the Durbin-Watson test; 2=no correlation, below 2=positive correlation, above 2=negative correlation
 
 ![durbin-watson](images/durbin-watson.png)
 
@@ -352,7 +361,7 @@ summary(model_outlier)
 
 
 ---
-# Alternative analysis: longitudinal data 
+# Longitudinal data 
 
 - Repeated measures analysis of variance (repeated measures ANOVA)
  
