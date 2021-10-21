@@ -12,6 +12,41 @@ output:
       highlightLines: true
       countIncrementalSlides: false
 ---
+```{css, echo=FALSE}
+pre {
+  white-space: pre-wrap;
+}
+.pull-left {
+  float: left;
+  width: 35%;
+}
+.pull-right {
+  float: right;
+  width: 60%;
+}
+.pull-left-c {
+  float: left;
+  width: 47%;
+}
+.pull-right-c {
+  float: right;
+  width: 47%;
+}
+img, video, iframe {
+  max-width: 100%;
+  max-height: 80%;
+}
+.tiny .remark-code {
+  font-size: 60% !important;
+}
+
+.teny .remark-code {
+  font-size: 50% !important;
+}
+.tizy .remark-code {
+  font-size: 45% !important;
+}
+```
 
 ```{r setup, include=FALSE}
 # Set working directory
@@ -23,6 +58,7 @@ options(htmltools.dir.version = FALSE)
 require(tidyverse)
 require(broom)
 require(ggfortify)
+library("ggpubr")
 
 data <- read_tsv("data/problem2_data.txt", col_names = c("Id", "Group", "Week", "Score"), col_types = "nfnn", skip = 1)
 
@@ -30,71 +66,96 @@ data <- data %>%
   mutate(Group = factor(Group, levels = c('Std', 'Exp')),
          Group = recode(Group, 
                         Std = "Standard",
-                        Exp = "Experimental (new)"))
+                        Exp = "Experimental"))
 
 data
 ```
 
-# Presentation of research question 
+# Research question 
 
-<!-- "A randomized trial evaluated a new therapy program designed to help patients recover from a stroke, comparing it to a standard program. Patients were evaluated at baseline (week 0), and for 7 consecutive weeks, using the Barthelindex. This score ranges from 0 to 100, higher scores indicating better functional ability". -->
+<b>Objective:</b> Evaluation of  a new therapy program designed to help patients recover from stroke.
+
+"A <b>randomized trial</b> evaluated a <b>new therapy program</b> designed to help patients recover from a stroke, comparing it to a standard program. 
+
+> Patients were <b>evaluated at baseline</b> (week 0), and for <b>7 consecutive weeks</b>, using the Barthelindex. This score ranges from 0 to 100, higher scores indicating better functional ability". 
 
 ---
+# Barthel index (BI)
 
+![BI](images/bi.jpg)
+---
 # Data description 
 
 <!-- How many individuals are there in the data set?  -->
+.pull-left[
+- 8 individuals per group (total n = 16)
 
-- Individuals in the data set 
-
-```{r, echo=FALSE}
+- Measured at baseline and for 7 consecutive weeks
+]
+.pull-right[
+```{r, echo=FALSE, results=FALSE}
 data %>% distinct(Id) %>% nrow()
 ```
 
 <!-- Summarize the variables using suitable tables and/or diagrams. -->
 
-- Visualised as boxplots 
+```{r, echo=FALSE, dev='png', dpi=300, fig.width=6,fig.height=4}
+#data %>%
+#  ggplot(aes(factor(Week), Score, fill = Group)) + 
+#  geom_boxplot() + 
+#  facet_wrap(~Group) +
+#  xlab("Week") +
+#  ylim(0,100)
 
-```{r, echo=FALSE}
-data %>%
-  ggplot(aes(factor(Week), Score, fill = Group)) + 
-  geom_boxplot() + 
-  facet_wrap(~Group) +
-  xlab("Week")
+ggboxplot(data, x = "Week", y = "Score", fill = "Group")
 ```
-
+]
 ---
 
 # Individual data
 
-- Why does it make sense to remove individual number 5? 
+.pull-left[
+
+- One individual in the experimental group with values of 100 across all weeks
+
+]
 
 <!-- Want to look at patients recovering from stroke, if a patient has 100 the patient is already fully (?) recovered at start and should not be included in this trial?  -->
+.pull-right[
+```{r, echo=FALSE, fig.width=6,fig.height=4, dev='png', dpi=300}
+#data %>%
+#  mutate(`Ìndividual (Id)`= factor(Id)) %>%
+#  ggplot(aes(Week, Score, color = `Ìndividual (Id)`)) +
+#  geom_line() +
+#  facet_wrap(~Group) 
 
-```{r, echo=FALSE}
-data %>%
-  ggplot(aes(Week, Score, color = factor(Id))) +
-  geom_line() +
-  facet_wrap(~Group)
+data_id_as_factor <- data %>% mutate(Id = factor(Id))
+ggline(data_id_as_factor, x = "Week", y = "Score", color = "Id", shape = "Id") + facet_wrap(~Group) + theme(legend.position = "none")
 ```
-
+]
 ---
 
-# Data without outlier 
-
-```{r}
+# Data without experimental outlier 
+.pull-left[
+```{r, echo=FALSE, results=FALSE}
 data_no_outlier <- data %>% filter(Id !=5)
 ```
+]
+.pull-right[
+```{r, echo=FALSE, fig.width=6,fig.height=4, dev='png', dpi=300}
+#data_no_outlier %>%
+#  ggplot(aes(factor(Week), Score, fill = Group)) + 
+#  geom_boxplot() +
+#  facet_wrap(~Group) +
+#  xlab("Week") +
+#  ylim(0,100)
 
-```{r, echo=FALSE}
-data_no_outlier %>%
-  ggplot(aes(factor(Week), Score, fill = Group)) + 
-  geom_boxplot() +
-  facet_wrap(~Group) +
-  xlab("Week")
+ggboxplot(data_no_outlier, x = "Week", y = "Score", fill = "Group")
+
 ```
+]
 
-<!-- "The impression is that both groups start at similar levels (how does this relate to randomization?), and gradually increase, but that the experimental group climbs faster. In a linear regression model, this corresponds to two separate slopes, which can be captured by an interaction term." -->
+ <!-- "The impression is that both groups start at similar levels (how does this relate to randomization?), and gradually increase, but that the experimental group climbs faster. In a linear regression model, this corresponds to two separate slopes, which can be captured by an interaction term." -->
 
 ---
 
@@ -102,11 +163,20 @@ data_no_outlier %>%
 
 <!-- Which analysis method did you choose?  -->
 
-- We chose linear regression.
+- We chose multiple linear regression (as prescribed by the exam).
+
+- We have numerical data
+- With a linear relationship between x and y
+- Two study groups 
+- Interested in the interaction between week and group
 
 <!-- Why? (This should be discussed even if the exam prescribes a certain analysis.)  -->
 
-- "When to prefer regression- If you are interested in the line itself (e.g. the slope), use regression?"
+```{r, echo=FALSE, results=FALSE}
+model <- lm(Score ~ Group + Week + Group : Week, data_no_outlier)
+model_outlier <- lm(Score ~ Group + Week + Group : Week, data)
+augment(model) %>% pull(.resid) %>% shapiro.test()
+```
 
 <!-- Explain why you think your chosen analysis is reasonable. -->
 
@@ -117,36 +187,67 @@ data_no_outlier %>%
 <!-- "Analyze the data using multiple linear regression with the following predictors: Group, week, and a group x week interaction term. How to include interaction terms depends on the statistical software." -->
 
 <!-- When presenting your results, tell the audience which number(s) you consider most important, and what they mean. Interpret your results in ordinary language. -->
+.pull-left[
 
+- Intercept is the value of y when all x = 0
+
+- Median score at week 0 for the Standard group
+
+### Score increase per week
+
+- Standard: 4.33
+
+- Experimental: 7.22
+]
+.pull-right[
+.tiny[
 ```{r}
-model <- lm(Score ~ Group + Week + Group * Week, data_no_outlier)
-
 summary(model)
 ```
-
+]
+]
 <!-- You should get 4 estimated regression coefficients, including the intercept. What do they mean? Which one tells us most about the new program? Does it seem promising? -->
 
-- Intercept just means that the median ?? starting point (of standard, why ??) is 37.5 and is significantly different from 0 (?) 
-
-- Does it mean that Week has a positive effect on outcome, and being in the experimental Group boosts this further?
-
 ---
 
-# Results continued
+# Results
 
-- Can be visualized as ? 
+.pull-left[
 
-```{r}
-data_no_outlier %>%
-  ggplot(aes(Week, Score, color = Group)) + 
-  geom_point(position = position_jitterdodge(), alpha = 0.5) +
-  stat_smooth(method = "lm", formula = y ~ x, se = FALSE)
+- Intercept is the value of y when all x = 0
+
+- Median score at week 0 for the Standard group
+
+### Score increase per week
+
+- Standard: 4.33
+
+- Experimental: 7.22
+
+]
+
+.pull-right[
+```{r, echo=FALSE, message=FALSE,fig.width=6,fig.height=4, dev='png', dpi=300}
+
+#data_no_outlier %>%
+#  ggplot(aes(Week, Score, color = Group)) + 
+#  geom_point(position = position_jitterdodge(), #alpha = 0.5) +
+#  stat_smooth(method = "lm", formula = y ~ x, se = #FALSE) +
+#  ylim(0,100)
+
+ggscatter(data_no_outlier, x = "Week", y = "Score", color = "Group", position = position_jitterdodge(), add = "reg.line", conf.int = TRUE, alpha = 0.3) + ylim(0,100)
+
+
+#data %>%
+#  ggplot(aes(Week, Score, color = Group)) + 
+#  geom_point(position = position_jitterdodge(), alpha = 0.5) +
+#  stat_smooth(method = "lm", formula = y ~ x, se = FALSE) +
+#  ylim(0,100)
 
 ```
+]
 
----
-
-``` {r}
+``` {r, eval=FALSE, echo=FALSE}
 exp <- data_no_outlier %>%
   filter(Group == "Experimental (new)")
 
@@ -156,48 +257,127 @@ std <- data_no_outlier %>%
 lm(Score ~ Week, exp)
 lm(Score ~ Week, std)
 
-exp %>% filter(Week == 0) %>% summarize(median(Score))
+exp %>% filter(Week == 0) %>% summarize(mean(Score))
 std %>% filter(Week == 0) %>% summarize(median(Score))
-data_no_outlier %>% filter(Week == 0) %>% summarize(median(Score))
+data %>% filter(Week == 0) %>% summarize(mean(Score))
 ```
 ---
-# Checking model assumptions
 
-``` {r}
+# Comparison to including outlier
 
+.pull-left[
+.tizy[
+```{r}
+summary(model_outlier)
+```
+]
+]
+
+.pull-right[
+```{r, echo=FALSE, message=FALSE,fig.width=6,fig.height=4, dev='png', dpi=300}
+
+#data_no_outlier %>%
+#  ggplot(aes(Week, Score, color = Group)) + 
+#  geom_point(position = position_jitterdodge(), #alpha = 0.5) +
+#  stat_smooth(method = "lm", formula = y ~ x, se = #FALSE) +
+#  ylim(0,100)
+
+ggscatter(data, x = "Week", y = "Score", color = "Group", position = position_jitterdodge(), add = "reg.line", conf.int = TRUE, alpha = 0.3) + ylim(0,100)
+
+
+#data %>%
+#  ggplot(aes(Week, Score, color = Group)) + 
+#  geom_point(position = position_jitterdodge(), alpha = 0.5) +
+#  stat_smooth(method = "lm", formula = y ~ x, se = FALSE) +
+#  ylim(0,100)
+
+```
+]
+
+---
+
+# Model assumptions: Normal residuals
+.pull-left[
+
+- The model assumes the residuals to be normally distributed 
+
+- Check graphically or numerically 
+
+]
+.pull-right[
+``` {r, echo=FALSE, fig.width=6,fig.height=2, dev='png', dpi=300, warning=FALSE}
 # Checking model assumptions
 #   - Checking normality
 #     - The model assumes the residuals to be normal (not x or y)
 #     - After computing these, normality can be checked
 #         - Graphically, e.g. histogram, Q-Q plot
 
-augment(model) %>%
-  ggplot(aes(.resid, fill = Group)) + 
-  geom_histogram(binwidth = 5, position = "identity", alpha = 1) +
-  facet_wrap(~Group)
+p1 <- augment(model) %>%
+  ggplot(aes(.resid)) + 
+  geom_histogram(binwidth = 5, position = "identity", alpha = 1)
+
+p1 <- gghistogram(augment(model), x = ".resid", fill = "grey")
 
 #         - Q-Q plot
 
-autoplot(model)[2]
+p2 <- ggqqplot(augment(model)$.resid)
+
+ggarrange(p1,p2, ncol = 2, nrow = 1,
+          labels = c("Histogram", "Q-Q plot"))
 
 #         - Numerically, e.g. the Shapiro-Wilk test.
 
 augment(model) %>% pull(.resid) %>% shapiro.test()
 
+
 ```
+]
 
 ---
-# Bonus question:
 
-> "Bonus question: The assumption of independent measurements is violated in this example. Why? Is this a serious problem? Can you think of an alternative analysis that overcomes this problem? What results does it give?"
+# Model assumptions: Linearity & homogeneity of residuals variance
 
-- Longitudinal study (several values from the same individual)
-- Model assumption of independent measurements is violated, since we have multiple samples (8) corresponding to the different weeks for each individual.
+.pull-left[
 
-```{r, comment="#"}
+- Linear relationship between x and y 
+
+- Equal SD for the residuals
+
+
+]
+
+.pull-right[
+```{r, echo=FALSE,fig.width=6,fig.height=4, dev='png', dpi=300}
+
+autoplot(model, data = data_no_outlier, colour = 'Group')[c(1,3)] + theme_pubr()
+
+```
+]
+
+---
+
+# Model assumptions: Independent measurements 
+
+> "Bonus question: The assumption of <b>independent measurements is violated</b> in this example [...]"
+
+### Why? 
+
+ <!-- "Why? Is this a serious problem? Can you think of an alternative analysis that overcomes this problem? What results does it give?" -->
+
+- Same individual measured at 8 time points (week 0-7)
+- Likely to be similar for each individual (serial correlation)
+-Serial correlation can be assessed with the Durbin-Watson test; 2=no correlation, below 2=positive correlation, above 2=negative correlation
+
+![durbin-watson](images/durbin-watson.png)
+
+```{r, comment="#", eval=FALSE, echo=FALSE}
 # Model assumptions
 # "The exact formulation of the linear regression model is:
 #   - Linear relationship between x and y
+
+# > cor(data_no_outlier$Score, data_no_outlier$Week)
+# [1] 0.5867039
+
 #   - Independent measurements
 #   - Normally distributed residuals
 #   - Equal SD sigma for the residuals. 
@@ -221,7 +401,6 @@ t_test <- data %>%
   select(Id, Group, diff) %>%
   distinct()
   
-
 # Maybe ? No longer balanced without number 5
 t.test(diff ~ Group, data = t_test, paired = TRUE)
 
@@ -236,7 +415,7 @@ t_test_no_outlier <- data_no_outlier %>%
 t.test(diff ~ Group, data = t_test_no_outlier, paired = TRUE)
 
 data_no_outlier %>% 
-  filter(Id != 9) %>% # Remove one at random
+  #filter(Id != 9) %>% # Remove one at random
   group_by(Id) %>%
   mutate(score_7 = Score[which(Week==7)], score_0 = Score[which(Week==0)]) %>%
   pivot_longer(cols = c("score_7", "score_0"), names_to = "week", values_to = "score") %>%
@@ -283,51 +462,93 @@ lm(score ~ group + week, data_no_outlier)
 #   - When including an interaction, the main effects should also be in the model.
 
 ```
+---
+# Alternative analysis
+> Combine the dependent values into a single one, e.g. an average or <b>difference</b>.
+
+.pull-right-c[
+.teny[
+``` {r, echo=FALSE}
+data_delta_score <- data_no_outlier %>% 
+  group_by(Id) %>%
+  mutate(score_7 = Score[which(Week==7)], 
+         score_0 = Score[which(Week==0)],
+         score_difference = score_7 - score_0
+         ) %>%
+  select(Id, Group, score_difference) %>%
+  distinct() 
+
+data_delta_score_outlier <- data %>% 
+  group_by(Id) %>%
+  mutate(score_7 = Score[which(Week==7)], 
+         score_0 = Score[which(Week==0)],
+         score_difference = score_7 - score_0
+         ) %>%
+  select(Id, Group, score_difference) %>%
+  distinct() 
+
+summary(lm(score_difference ~ Group, data_delta_score))
+
+t.test(score_difference ~ Group, data_delta_score)
+```
+]
+]
+.pull-left.c[
+
+```{r, message=FALSE, echo=FALSE, dev='png', dpi=300}
+#data_delta_score %>%
+#  ggplot(aes(Group, score_difference, color = #Group, group = 1)) +
+#  geom_point() + 
+#  geom_smooth(method = "lm")
+
+ggboxplot(data_delta_score, x = "Group", y = "score_difference", fill = "Group") + stat_compare_means(method = "t.test", label = "p.signif") + ylab("Score difference (week 7 - week 0)") 
+  
+
+#fit <- lm(score_difference ~ Group, data_delta_score)
+#summary(fit)
+
+#t.test(score_difference ~ Group, data_delta_score)
+```
+]
+
+```{r, echo=FALSE}
+# summary(aov(Score ~ Week + Group + Week:Group, data_no_outlier)) ?
+```
+---
+# Alternative analysis: longitudinal data 
+
+- Repeated measures analysis of variance (repeated measures ANOVA)
+ 
+- Generalized estimating equation, GEE
+ 
+- Linear mixed-effects model, LMM
+ 
+- Generalized linear mixed model, GLMM
 
 ---
 
-# Conclusions and discussion
+# Bonus question: with outlier
 
-- What results did you get?
+- Repeated measures ANOVA
 
-- How do you interpret them?
+![anova-outlier](images/anova-outlier.png)
+---
+# Bonus question: with outlier
 
-- What biological conclusions do you draw?
+![anova-outlier](images/anova-outlier-2.png)
+---
+# Bonus question: without outlier
+- Repeated measures ANOVA 
 
-- Keep the presentation concise. It should take no longer than 15 minutes, followed by approximately 10 minutes discussion.
-
+![anova-outlier](images/anova-no-outlier.png)
 ---
 
-# Example slide
+# Bonus question: without outlier
 
-```{r, fig.width=14,fig.height=5, dev='png', dpi=300}
-
-data %>%
-  ggplot(aes(week, score, group = week, fill = group)) + 
-  geom_boxplot() +
-  facet_wrap(~ group)
-
-```
-
+![anova-outlier](images/anova-no-outlier-2.png)
 ---
 
-# Example slide
+# Conclusions
 
-```{r, echo=F, fig.width=14,fig.height=5, dev='png', dpi=300}
-
-data %>%
-  ggplot(aes(week, score, group = id, color = factor(id))) +
-  geom_line() + 
-  facet_wrap(~group)
-
-```
-
-```{r}
-diff <- data_no_outlier %>%
-  group_by(id) %>%
-  mutate(diff = score[which(week==7)] - score[which(week==0)]) %>%
-  select(id, group, diff)
-
-diff
-```
-
+Compared to standard treatment, the experimental treatment may increase functional ability measured
+with the Barthel index in post-stroke patients. Both groups improved over the 7 week period. Further studies are needed in larger samples, as well as with longer follow-up time. Inclusion and exclusion criteria need to be more clearly stated.

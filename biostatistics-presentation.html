@@ -4,7 +4,7 @@
     <title>Introduction to biostatistics</title>
     <meta charset="utf-8" />
     <meta name="author" content="Felix Lenner, Johnny Pellas &amp; Xue Yu" />
-    <meta name="date" content="2021-10-18" />
+    <meta name="date" content="2021-10-21" />
     <script src="libs/header-attrs/header-attrs.js"></script>
     <link href="libs/remark-css/default.css" rel="stylesheet" />
     <link href="libs/remark-css/default-fonts.css" rel="stylesheet" />
@@ -16,103 +16,162 @@ class: center, middle, inverse, title-slide
 # Introduction to biostatistics
 ## Problem 2
 ### Felix Lenner, Johnny Pellas &amp; Xue Yu
-### 2021-10-18
+### 2021-10-21
 
 ---
 
+&lt;style type="text/css"&gt;
+pre {
+  white-space: pre-wrap;
+}
+.pull-left {
+  float: left;
+  width: 35%;
+}
+.pull-right {
+  float: right;
+  width: 60%;
+}
+.pull-left-c {
+  float: left;
+  width: 47%;
+}
+.pull-right-c {
+  float: right;
+  width: 47%;
+}
+img, video, iframe {
+  max-width: 100%;
+  max-height: 80%;
+}
+.tiny .remark-code {
+  font-size: 60% !important;
+}
+
+.teny .remark-code {
+  font-size: 50% !important;
+}
+.tizy .remark-code {
+  font-size: 45% !important;
+}
+&lt;/style&gt;
 
 
 
-# Presentation of research question 
+# Research question 
 
-&gt; "A randomized trial evaluated a new therapy program designed to help patients recover from a stroke, comparing it to a standard program. Patients were evaluated at baseline (week 0), and for 7 consecutive weeks, using the Barthelindex. This score ranges from 0 to 100, higher scores indicating better functional ability".
+&lt;b&gt;Objective:&lt;/b&gt; Evaluation of  a new therapy program designed to help patients recover from stroke.
+
+"A &lt;b&gt;randomized trial&lt;/b&gt; evaluated a &lt;b&gt;new therapy program&lt;/b&gt; designed to help patients recover from a stroke, comparing it to a standard program. 
+
+&gt; Patients were &lt;b&gt;evaluated at baseline&lt;/b&gt; (week 0), and for &lt;b&gt;7 consecutive weeks&lt;/b&gt;, using the Barthelindex. This score ranges from 0 to 100, higher scores indicating better functional ability". 
 
 ---
+# Barthel index (BI)
 
+![BI](images/bi.jpg)
+---
 # Data description 
 
-&gt; How many individuals are there in the data set? 
+&lt;!-- How many individuals are there in the data set?  --&gt;
+.pull-left[
+- 8 individuals per group (total n = 16)
+
+- Measured at baseline and for 7 consecutive weeks
+]
+.pull-right[
 
 
-```
-## [1] 16
-```
-
-&gt; Summarize the variables using suitable tables and/or diagrams.
-
-![](biostatistics-presentation_files/figure-html/unnamed-chunk-2-1.png)&lt;!-- --&gt;
----
-# Individual data
-
-
-```r
-data %&gt;%
-  ggplot(aes(week, score, color = factor(id))) +
-  geom_line() +
-  facet_wrap(~group)
-```
+&lt;!-- Summarize the variables using suitable tables and/or diagrams. --&gt;
 
 ![](biostatistics-presentation_files/figure-html/unnamed-chunk-3-1.png)&lt;!-- --&gt;
+]
 ---
 
-# Remove outlier (?)
+# Individual data
 
+.pull-left[
 
-```r
-data_no_outlier &lt;- data %&gt;% filter(id !=5)
-```
+- One individual in the experimental group with values of 100 across all weeks
 
-![](biostatistics-presentation_files/figure-html/unnamed-chunk-5-1.png)&lt;!-- --&gt;
+]
 
-&gt; "The impression is that both groups start at similar levels (how does this relate to randomization?), and gradually increase, but that the experimental group climbs faster. In a linear regression model, this corresponds to two separate slopes, which can be captured by an interaction term."
+&lt;!-- Want to look at patients recovering from stroke, if a patient has 100 the patient is already fully (?) recovered at start and should not be included in this trial?  --&gt;
+.pull-right[
+![](biostatistics-presentation_files/figure-html/unnamed-chunk-4-1.png)&lt;!-- --&gt;
+]
+---
+
+# Data without experimental outlier 
+.pull-left[
+
+]
+.pull-right[
+![](biostatistics-presentation_files/figure-html/unnamed-chunk-6-1.png)&lt;!-- --&gt;
+]
+
+ &lt;!-- "The impression is that both groups start at similar levels (how does this relate to randomization?), and gradually increase, but that the experimental group climbs faster. In a linear regression model, this corresponds to two separate slopes, which can be captured by an interaction term." --&gt;
 
 ---
 
 # Statistical analysis
 
-&gt; Which analysis method did you choose? 
+&lt;!-- Which analysis method did you choose?  --&gt;
 
-We chose linear regression.
+- We chose multiple linear regression (as prescribed by the exam).
+
+- We have numerical data
+- With a linear relationship between x and y
+- Two study groups 
+- Interested in the interaction between week and group
+
+&lt;!-- Why? (This should be discussed even if the exam prescribes a certain analysis.)  --&gt;
 
 
-```r
-# "When to prefer regression:
-#   - If you are interested in the line itself (e.g. the slope), use regression.
-```
 
-&gt; Why? (This should be discussed even if the exam prescribes a certain analysis.) 
-
-&gt; Explain why you think your chosen analysis is reasonable.
-
-&gt; When presenting your results, tell the audience which number(s) you consider most important, and what they mean. Interpret your results in ordinary language.
-
-&gt; "Analyze the data using multiple linear regression with the following predictors: Group, week, and a group x week interaction term. How to include interaction terms depends on the statistical software."
+&lt;!-- Explain why you think your chosen analysis is reasonable. --&gt;
 
 ---
 
 # Results
 
+&lt;!-- "Analyze the data using multiple linear regression with the following predictors: Group, week, and a group x week interaction term. How to include interaction terms depends on the statistical software." --&gt;
+
+&lt;!-- When presenting your results, tell the audience which number(s) you consider most important, and what they mean. Interpret your results in ordinary language. --&gt;
+.pull-left[
+
+- Intercept is the value of y when all x = 0
+
+- Median score at week 0 for the Standard group
+
+### Score increase per week
+
+- Standard: 4.33
+
+- Experimental: 7.22
+]
+.pull-right[
+.tiny[
 
 ```r
-full &lt;- lm(score ~ group + week + group * week, data_no_outlier)
-summary(full)
+summary(model)
 ```
 
 ```
 ## 
 ## Call:
-## lm(formula = score ~ group + week + group * week, data = data_no_outlier)
+## lm(formula = Score ~ Group + Week + Group:Week, data = data_no_outlier)
 ## 
 ## Residuals:
 ##     Min      1Q  Median      3Q     Max 
 ## -47.812  -9.252  -0.106  13.896  33.839 
 ## 
 ## Coefficients:
-##               Estimate Std. Error t value Pr(&gt;|t|)    
-## (Intercept)    37.5000     4.0999   9.147 2.37e-15 ***
-## groupExp      -10.4762     6.0016  -1.746   0.0835 .  
-## week            4.3304     0.9801   4.418 2.25e-05 ***
-## groupExp:week   2.8975     1.4347   2.020   0.0457 *  
+##                        Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)             37.5000     4.0999   9.147 2.37e-15 ***
+## GroupExperimental      -10.4762     6.0016  -1.746   0.0835 .  
+## Week                     4.3304     0.9801   4.418 2.25e-05 ***
+## GroupExperimental:Week   2.8975     1.4347   2.020   0.0457 *  
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
@@ -120,336 +179,216 @@ summary(full)
 ## Multiple R-squared:  0.3666,	Adjusted R-squared:  0.3502 
 ## F-statistic: 22.38 on 3 and 116 DF,  p-value: 1.677e-11
 ```
+]
+]
+&lt;!-- You should get 4 estimated regression coefficients, including the intercept. What do they mean? Which one tells us most about the new program? Does it seem promising? --&gt;
 
-&gt; "You should get 4 estimated regression coefficients, including the intercept. What do they mean? Which one tells us most about the new program? Does it seem promising?"
+---
 
+# Results
+
+.pull-left[
+
+- Intercept is the value of y when all x = 0
+
+- Median score at week 0 for the Standard group
+
+### Score increase per week
+
+- Standard: 4.33
+
+- Experimental: 7.22
+
+]
+
+.pull-right[
+![](biostatistics-presentation_files/figure-html/unnamed-chunk-9-1.png)&lt;!-- --&gt;
+]
+
+
+---
+
+# Comparison to including outlier
+
+.pull-left[
+.tizy[
 
 ```r
-data_no_outlier %&gt;%
-  ggplot(aes(week, score, color = group)) +
-  geom_point(alpha = 0.5) +
-  stat_smooth(method = "lm", formula = y ~ x)
-```
-
-![](biostatistics-presentation_files/figure-html/unnamed-chunk-8-1.png)&lt;!-- --&gt;
-
-```r
-autoplot(full)
-```
-
-![](biostatistics-presentation_files/figure-html/unnamed-chunk-8-2.png)&lt;!-- --&gt;
-
-
-```r
-regression &lt;-lm(data = data_no_outlier, score ~ group + week + group * week)
-
-summary(regression)
+summary(model_outlier)
 ```
 
 ```
 ## 
 ## Call:
-## lm(formula = score ~ group + week + group * week, data = data_no_outlier)
+## lm(formula = Score ~ Group + Week + Group:Week, data = data)
 ## 
 ## Residuals:
 ##     Min      1Q  Median      3Q     Max 
-## -47.812  -9.252  -0.106  13.896  33.839 
+## -47.812 -12.746  -3.638  14.036  63.854 
 ## 
 ## Coefficients:
-##               Estimate Std. Error t value Pr(&gt;|t|)    
-## (Intercept)    37.5000     4.0999   9.147 2.37e-15 ***
-## groupExp      -10.4762     6.0016  -1.746   0.0835 .  
-## week            4.3304     0.9801   4.418 2.25e-05 ***
-## groupExp:week   2.8975     1.4347   2.020   0.0457 *  
+##                        Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)              37.500      4.818   7.783 2.39e-12 ***
+## GroupExperimental        -1.354      6.814  -0.199 0.842795    
+## Week                      4.330      1.152   3.760 0.000261 ***
+## GroupExperimental:Week    1.994      1.629   1.224 0.223191    
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
-## Residual standard error: 17.96 on 116 degrees of freedom
-## Multiple R-squared:  0.3666,	Adjusted R-squared:  0.3502 
-## F-statistic: 22.38 on 3 and 116 DF,  p-value: 1.677e-11
+## Residual standard error: 21.11 on 124 degrees of freedom
+## Multiple R-squared:  0.273,	Adjusted R-squared:  0.2554 
+## F-statistic: 15.52 on 3 and 124 DF,  p-value: 1.242e-08
 ```
+]
+]
 
-```r
-data_no_outlier %&gt;%
-  filter(group == "Std") %&gt;%
-  lm(score ~ week, data = .)
-```
-
-```
-## 
-## Call:
-## lm(formula = score ~ week, data = .)
-## 
-## Coefficients:
-## (Intercept)         week  
-##       37.50         4.33
-```
-
-```r
-# Intercept: The mean score at week 0 is 32.76, but how does it relate to the different groups? 
-
-# On average, the score increases 5.68 +- 0.72 (?) for each week. 
-```
-
-&gt; "Bonus question: The assumption of independent measurements is violated in this example. Why? Is this a serious problem? Can you think of an alternative analysis that overcomes this problem? What results does it give?"
-
-
-```r
-# Model assumptions
-# "The exact formulation of the linear regression model is:
-#   - Linear relationship between x and y
-#   - Independent measurements
-#   - Normally distributed residuals
-#   - Equal SD sigma for the residuals. 
-    
-# Checking model assumptions
-#   - Checking normality
-#     - The model assumes the residuals to be normal (not x or y)
-#     - After computing these, normality can be checked
-#         - Graphically, e.g. histogram, Q-Q plot
-#         - Numerically, e.g. the Shapiro-Wilk test.
-
-augment(full) %&gt;%
-  ggplot(aes(.resid, fill = group)) + 
-  geom_histogram(binwidth = 5, position = "identity", alpha = 0.7)
-```
-
-![](biostatistics-presentation_files/figure-html/unnamed-chunk-10-1.png)&lt;!-- --&gt;
-
-```r
-autoplot(full)[2]
-```
-
-![](biostatistics-presentation_files/figure-html/unnamed-chunk-10-2.png)&lt;!-- --&gt;
-
-```r
-augment(full) %&gt;% pull(.resid) %&gt;% shapiro.test()
-```
-
-```
-# 
-# 	Shapiro-Wilk normality test
-# 
-# data:  .
-# W = 0.96765, p-value = 0.005482
-```
-
-```r
-#   - The independence assumption
-#     - Independence is a question of study design.
-#     - The dependent values (y) should be samples individually, not in groups. 
-#     - Equivalently: Each row in the database should be independent of other rows (OK to measure x and y on the same person).
-#     - Example of non-independence:
-#       - Longitudinal studies (several values from the same individual)
-#       - Cluster sampling.
-#       - Paired data
-#   - Dependent data
-#     - If the study design violates independence, this _must_ be handled statistically. 
-#     - Some possibilities (Chapters 41 - 42):
-#       - Combine the dependent values into a single one, e.g. an average or difference. (Like the paired t-test ?)
-
-t_test &lt;- data_no_outlier %&gt;% 
-  group_by(id) %&gt;%
-  mutate(score_7 = score[which(week==7)], score_0 = score[which(week==0)]) %&gt;%
-  select(id, group, score_0, score_7) %&gt;% distinct() %&gt;%
-  pivot_longer(c(score_0, score_7), names_to = "week", values_to = "score")
-
-# Not right?
-t.test(score ~ week, data = t_test, paired = TRUE)
-```
-
-```
-# 
-# 	Paired t-test
-# 
-# data:  score by week
-# t = -7.5437, df = 14, p-value = 2.695e-06
-# alternative hypothesis: true difference in means is not equal to 0
-# 95 percent confidence interval:
-#  -47.94777 -26.71890
-# sample estimates:
-# mean of the differences 
-#               -37.33333
-```
-
-```r
-#       - Use robust standard errors. 
-#       - Model the dependence, using a random effects model. 
-
-# Categorical x variables
-#   - One often has categorical variables in the data set.
-#   - Can we add suck variables to the model? Yes, using dummy variables.
-#   - For a dichotomous variable, such as gender, there is only one dummy variable:
-#     - B tells how much larger y is for (1) than for (0)
-
-# Smoking example, numerical data in two groups
-#   - Could use t-test
-#   - Try linear regression with a single variable (smoking) instead!
-#   - (This is actually the same thing, as we shall see).
-
-data_no_outlier %&gt;%
-  ggplot(aes(group, score)) +
-  geom_boxplot()
-```
-
-![](biostatistics-presentation_files/figure-html/unnamed-chunk-10-3.png)&lt;!-- --&gt;
-
-```r
-lm(score ~ group, data_no_outlier)
-```
-
-```
-# 
-# Call:
-# lm(formula = score ~ group, data = data_no_outlier)
-# 
-# Coefficients:
-# (Intercept)     groupExp  
-#     52.6562      -0.3348
-```
-
-```r
-# Would we like to compare groups for each week? Not really, the important part I guess is the end result (or difference between start and end).
-
-data_no_outlier %&gt;%
-  ggplot(aes(week, score, color = group)) +
-  geom_jitter(width = 0.2, height = 0, alpha = 0.5)
-```
-
-![](biostatistics-presentation_files/figure-html/unnamed-chunk-10-4.png)&lt;!-- --&gt;
-
-```r
-lm(score ~ group + week, data_no_outlier)
-```
-
-```
-# 
-# Call:
-# lm(formula = score ~ group + week, data = data_no_outlier)
-# 
-# Coefficients:
-# (Intercept)     groupExp         week  
-#     32.7674      -0.3348       5.6825
-```
-
-```r
-# Interaction
-#   - Implicit assumption: The effect of smoking is the same for all ages.
-#   - Corresponds to parallel lines.
-#   - Couldn't we imagine non-parallel lines, e.g. impaired development for smokers?
-#   - Sure! If we wish to study that, we must modify the model, adding an interaction term:
-#   - Corresponds to an extras slope for smokers...
-
-glm(score ~ week + group + week * group, data_no_outlier, family = "gaussian") 
-```
-
-```
-# 
-# Call:  glm(formula = score ~ week + group + week * group, family = "gaussian", 
-#     data = data_no_outlier)
-# 
-# Coefficients:
-#   (Intercept)           week       groupExp  week:groupExp  
-#        37.500          4.330        -10.476          2.898  
-# 
-# Degrees of Freedom: 119 Total (i.e. Null);  116 Residual
-# Null Deviance:	    59100 
-# Residual Deviance: 37440 	AIC: 1040
-```
-
-```r
-lm(score ~ week + group + week * group, data_no_outlier)
-```
-
-```
-# 
-# Call:
-# lm(formula = score ~ week + group + week * group, data = data_no_outlier)
-# 
-# Coefficients:
-#   (Intercept)           week       groupExp  week:groupExp  
-#        37.500          4.330        -10.476          2.898
-```
-
-```r
-#   - When including an interaction, the main effects should also be in the model.
-
-autoplot(full)
-```
-
-![](biostatistics-presentation_files/figure-html/unnamed-chunk-10-5.png)&lt;!-- --&gt;
-
-```r
-data_no_outlier %&gt;%
-  ggplot(aes(week, score, color = group)) +
-  geom_point() + 
-  geom_smooth(method = lm, se = FALSE, formula = y ~ x)
-```
-
-![](biostatistics-presentation_files/figure-html/unnamed-chunk-10-6.png)&lt;!-- --&gt;
-
-
-
----
-
-# Conclusions and discussion
-
-- What results did you get?
-
-- How do you interpret them?
-
-- What biological conclusions do you draw?
-
-- Keep the presentation concise. It should take no longer than 15 minutes, followed by approximately 10 minutes discussion.
-
----
-
-# Example slide
-
-
-```r
-data %&gt;%
-  ggplot(aes(week, score, group = week, fill = group)) + 
-  geom_boxplot() +
-  facet_wrap(~ group)
-```
-
-![](biostatistics-presentation_files/figure-html/unnamed-chunk-11-1.png)&lt;!-- --&gt;
-
----
-
-# Example slide
-
+.pull-right[
 ![](biostatistics-presentation_files/figure-html/unnamed-chunk-12-1.png)&lt;!-- --&gt;
+]
+
+---
+
+# Model assumptions: Normal residuals
+.pull-left[
+
+- The model assumes the residuals to be normally distributed 
+
+- Check graphically or numerically 
+
+]
+.pull-right[
+![](biostatistics-presentation_files/figure-html/unnamed-chunk-13-1.png)&lt;!-- --&gt;
+
+```
+## 
+## 	Shapiro-Wilk normality test
+## 
+## data:  .
+## W = 0.96765, p-value = 0.005482
+```
+]
+
+---
+
+# Model assumptions: Linearity &amp; homogeneity of residuals variance
+
+.pull-left[
+
+- Linear relationship between x and y 
+
+- Equal SD for the residuals
 
 
-```r
-diff &lt;- data_no_outlier %&gt;%
-  group_by(id) %&gt;%
-  mutate(diff = score[which(week==7)] - score[which(week==0)]) %&gt;%
-  select(id, group, diff)
+]
 
-diff
+.pull-right[
+![](biostatistics-presentation_files/figure-html/unnamed-chunk-14-1.png)&lt;!-- --&gt;
+]
+
+---
+
+# Model assumptions: Independent measurements 
+
+&gt; "Bonus question: The assumption of &lt;b&gt;independent measurements is violated&lt;/b&gt; in this example [...]"
+
+### Why? 
+
+ &lt;!-- "Why? Is this a serious problem? Can you think of an alternative analysis that overcomes this problem? What results does it give?" --&gt;
+
+- Same individual measured at 8 time points (week 0-7)
+- Likely to be similar for each individual (serial correlation)
+-Serial correlation can be assessed with the Durbin-Watson test; 2=no correlation, below 2=positive correlation, above 2=negative correlation
+
+![durbin-watson](images/durbin-watson.png)
+
+
+---
+# Alternative analysis
+&gt; Combine the dependent values into a single one, e.g. an average or &lt;b&gt;difference&lt;/b&gt;.
+
+.pull-right-c[
+.teny[
+
+```
+## 
+## Call:
+## lm(formula = score_difference ~ Group, data = data_delta_score)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -22.500 -10.536  -3.571   6.964  27.500 
+## 
+## Coefficients:
+##                   Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)         27.500      5.789   4.750 0.000379 ***
+## GroupExperimental   21.071      8.475   2.486 0.027280 *  
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 16.37 on 13 degrees of freedom
+## Multiple R-squared:  0.3223,	Adjusted R-squared:  0.2702 
+## F-statistic: 6.182 on 1 and 13 DF,  p-value: 0.02728
 ```
 
 ```
-## # A tibble: 120 × 3
-## # Groups:   id [15]
-##       id group  diff
-##    &lt;dbl&gt; &lt;fct&gt; &lt;dbl&gt;
-##  1     1 Exp      45
-##  2     1 Exp      45
-##  3     1 Exp      45
-##  4     1 Exp      45
-##  5     1 Exp      45
-##  6     1 Exp      45
-##  7     1 Exp      45
-##  8     1 Exp      45
-##  9     2 Exp      30
-## 10     2 Exp      30
-## # … with 110 more rows
+## 
+## 	Welch Two Sample t-test
+## 
+## data:  score_difference by Group
+## t = -2.5204, df = 12.971, p-value = 0.02562
+## alternative hypothesis: true difference in means between group Standard and group Experimental is not equal to 0
+## 95 percent confidence interval:
+##  -39.137300  -3.005557
+## sample estimates:
+##     mean in group Standard mean in group Experimental 
+##                   27.50000                   48.57143
 ```
+]
+]
+.pull-left.c[
 
+![](biostatistics-presentation_files/figure-html/unnamed-chunk-17-1.png)&lt;!-- --&gt;
+]
+
+
+---
+# Alternative analysis: longitudinal data 
+
+- Repeated measures analysis of variance (repeated measures ANOVA)
+ 
+- Generalized estimating equation, GEE
+ 
+- Linear mixed-effects model, LMM
+ 
+- Generalized linear mixed model, GLMM
+
+---
+
+# Bonus question: with outlier
+
+- Repeated measures ANOVA
+
+![anova-outlier](images/anova-outlier.png)
+---
+# Bonus question: with outlier
+
+![anova-outlier](images/anova-outlier-2.png)
+---
+# Bonus question: without outlier
+- Repeated measures ANOVA 
+
+![anova-outlier](images/anova-no-outlier.png)
+---
+
+# Bonus question: without outlier
+
+![anova-outlier](images/anova-no-outlier-2.png)
+---
+
+# Conclusions
+
+Compared to standard treatment, the experimental treatment may increase functional ability measured
+with the Barthel index in post-stroke patients. Both groups improved over the 7 week period. Further studies are needed in larger samples, as well as with longer follow-up time. Inclusion and exclusion criteria need to be more clearly stated.
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
