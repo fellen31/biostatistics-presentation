@@ -166,7 +166,7 @@ ggboxplot(data_no_outlier, x = "Week", y = "Score", fill = "Group")
 - We chose multiple linear regression (as prescribed by the exam).
 
 - We have numerical data
-- With a linear relationship between x and y
+- A linear relationship between x and y
 - Two study groups 
 - Interested in the interaction between week and group
 
