@@ -54,6 +54,14 @@ img, video, iframe {
 .tizy .remark-code {
   font-size: 45% !important;
 }
+.center2 {
+  margin: 0;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  -ms-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+}
 &lt;/style&gt;
 
 
@@ -61,13 +69,12 @@ img, video, iframe {
 # Research question 
 
 &lt;b&gt;Objective:&lt;/b&gt; Evaluation of  a new therapy program designed to help patients recover from stroke.
-
-&gt; "A &lt;b&gt;randomized trial&lt;/b&gt; evaluated a &lt;b&gt;new therapy program&lt;/b&gt; designed to help patients recover from a stroke, comparing it to a standard program. 
-
-&gt; Patients were &lt;b&gt;evaluated at baseline&lt;/b&gt; (week 0), and for &lt;b&gt;7 consecutive weeks&lt;/b&gt;, using the Barthelindex. This score ranges from 0 to 100, higher scores indicating better functional ability". 
+&lt;br&gt;
+&lt;br&gt;
+&gt; "A &lt;b&gt;randomized trial&lt;/b&gt; evaluated a &lt;b&gt;new therapy program&lt;/b&gt; designed to help patients recover from a stroke, comparing it to a standard program. Patients were &lt;b&gt;evaluated at baseline&lt;/b&gt; (week 0), and for &lt;b&gt;7 consecutive weeks&lt;/b&gt;, using the Barthelindex. This score ranges from 0 to 100, higher scores indicating better functional ability". 
 
 ---
-# Barthel index (BI)
+# Barthel Index (BI)
 
 ![BI](images/bi.jpg)
 ---
@@ -118,7 +125,7 @@ img, video, iframe {
 
 &lt;!-- Which analysis method did you choose?  --&gt;
 
-- We chose multiple linear regression (as prescribed by the exam).
+- We chose to do a multiple linear regression (as prescribed by the exam)
 
 ### Why?
 - We have numerical data
@@ -146,13 +153,13 @@ img, video, iframe {
 
 .pull-left[
 
-- Intercept: the value of y if all the x's are 0 
+- &lt;b&gt;Intercept:&lt;/b&gt; the value of y if all the x's are 0 
 
-- GroupExperimental: 10.5 lower estimated mean score than standard group (at week 0?)
+- &lt;b&gt;Group:&lt;/b&gt; Experimental estimated mean score 10.5 points lower than the standard group
 
-- Week: Standard group score increases 4.33/week
+- &lt;b&gt;Week:&lt;/b&gt; Standard group score increases 4.33 per week
 
-- Interaction term: Experimental group score increases with 4.3+2.89 per week
+- &lt;b&gt;Interaction:&lt;/b&gt; Experimental group score increases with 4.33 + 2.89 per week
 
 ]
 
@@ -275,22 +282,31 @@ summary(model_outlier)
 ```
 ]
 
+???
+
+Normality of residuals. The residual errors are assumed to be normally distributed.
+
 ---
 
 # Model assumptions: Linearity &amp; Homogeneity of residuals
 
 .pull-left[
 
-- Linear relationship between x and y (residuals should be as close to 0 as possible)
+- Linear relationship between x and y
 
 - Equal SD for the residuals
-
 
 ]
 
 .pull-right[
 ![](biostatistics-presentation_files/figure-html/unnamed-chunk-14-1.png)&lt;!-- --&gt;
 ]
+
+???
+
+Linearity of the data. The relationship between the predictor (x) and the outcome (y) is assumed to be linear.
+
+Homogeneity of residuals variance. The residuals are assumed to have a constant variance (homoscedasticity). Homoscedasticity in a model means that the error is constant along the values of the dependent variable.
 
 ---
 
@@ -306,12 +322,59 @@ summary(model_outlier)
 
 - Likely to be similar for each individual (serial correlation)
 
-- Serial correlation can be assessed with the Durbin-Watson test; 2=no correlation, below 2=positive correlation, above 2=negative correlation
+Serial correlation can be assessed with the Durbin-Watson test; 2=no correlation, below 2=positive correlation, above 2=negative correlation
 
 ![durbin-watson](images/durbin-watson.png)
 
 
+
 ---
+# Longitudinal data 
+
+- Repeated measures analysis of variance (repeated measures ANOVA)
+ 
+- Generalized estimating equation, GEE
+ 
+- Linear mixed-effects model, LMM
+ 
+- Generalized linear mixed model, GLMM
+
+---
+
+# Bonus question: with outlier
+
+- Repeated measures ANOVA
+
+![anova-outlier](images/anova-outlier.png)
+---
+# Bonus question: with outlier
+
+![anova-outlier](images/anova-outlier-2.png)
+---
+# Bonus question: without outlier
+- Repeated measures ANOVA 
+
+![anova-outlier](images/anova-no-outlier.png)
+---
+
+# Bonus question: without outlier
+
+![anova-outlier](images/anova-no-outlier-2.png)
+---
+
+# Conclusions
+
+Compared to standard treatment, the experimental treatment may increase functional ability measured
+with the Barthel index in post-stroke patients. Both groups improved over the 7 week period. Further studies are needed in larger samples, as well as with longer follow-up time. Inclusion and exclusion criteria need to be more clearly stated.
+
+---
+
+.center2[
+# Thanks for listening!
+]
+
+---
+
 # Alternative analysis
 &gt; Combine the dependent values into a single one, e.g. an average or &lt;b&gt;difference&lt;/b&gt;.
 
@@ -360,44 +423,6 @@ summary(model_outlier)
 ]
 
 
----
-# Longitudinal data 
-
-- Repeated measures analysis of variance (repeated measures ANOVA)
- 
-- Generalized estimating equation, GEE
- 
-- Linear mixed-effects model, LMM
- 
-- Generalized linear mixed model, GLMM
-
----
-
-# Bonus question: with outlier
-
-- Repeated measures ANOVA
-
-![anova-outlier](images/anova-outlier.png)
----
-# Bonus question: with outlier
-
-![anova-outlier](images/anova-outlier-2.png)
----
-# Bonus question: without outlier
-- Repeated measures ANOVA 
-
-![anova-outlier](images/anova-no-outlier.png)
----
-
-# Bonus question: without outlier
-
-![anova-outlier](images/anova-no-outlier-2.png)
----
-
-# Conclusions
-
-Compared to standard treatment, the experimental treatment may increase functional ability measured
-with the Barthel index in post-stroke patients. Both groups improved over the 7 week period. Further studies are needed in larger samples, as well as with longer follow-up time. Inclusion and exclusion criteria need to be more clearly stated.
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
