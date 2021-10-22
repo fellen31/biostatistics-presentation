@@ -135,7 +135,7 @@ But we try to understand why: ignore repeated measurements
 
 For choosing the independent variables:
 - Exp and Std groups
-- Rime interval between the initiation of the treatment to the time point that you measure the BI score matters (the longer patients recover, the better they may get)
+- Time interval between the initiation of the treatment to the time point that you measure the BI score matters (the longer patients recover, the better they may get)
 
 
 <i>Time is lurking under the surface</i>
