@@ -82,44 +82,28 @@ data
 # Research question 
 
 <b>Objective:</b> Evaluation of  a new therapy program designed to help patients recover from stroke.
-<br>
-<br>
-> "A <b>randomized trial</b> evaluated a <b>new therapy program</b> designed to help patients recover from a stroke, comparing it to a standard program. Patients were <b>evaluated at baseline</b> (week 0), and for <b>7 consecutive weeks</b>, using the Barthelindex. This score ranges from 0 to 100, higher scores indicating better functional ability". 
+
+<b>Design:</b>
+- Randomized trial comparing the new therapy to a standard program.
+- Patients were evaluated at baseline (week 0) and once per week for 7 consecutive weeks with the Barthel index. The higher scores indicating a higher degree of independence.
 
 ---
 # Barthel Index (BI)
 
 ![BI](images/bi.jpg)
 ---
-# Data description 
 
-<!-- How many individuals are there in the data set?  -->
-.pull-left[
-- 8 individuals per group (total n = 16)
+# Data description
 
-- Measured at baseline and for 7 consecutive weeks
-]
-.pull-right[
 ```{r, echo=FALSE, results=FALSE}
-data %>% distinct(Id) %>% nrow()
+data_no_outlier <- data %>% filter(Id !=5)
 ```
 
-<!-- Summarize the variables using suitable tables and/or diagrams. -->
-
-```{r, echo=FALSE, dev='png', dpi=300, fig.width=6,fig.height=4}
-#data %>%
-#  ggplot(aes(factor(Week), Score, fill = Group)) + 
-#  geom_boxplot() + 
-#  facet_wrap(~Group) +
-#  xlab("Week") +
-#  ylim(0,100)
-
-ggboxplot(data, x = "Week", y = "Score", fill = "Group")
-```
-]
----
-
-# Individual data
+- 8 patients enrolled in each group
+- Longitudinal data
+- Fixed time interval (1 week) between measurements
+- No missing data
+- </>BUT</b> one individual which has 100 across all data points..
 
 .pull-left[
 
@@ -140,29 +124,6 @@ data_id_as_factor <- data %>% mutate(Id = factor(Id))
 ggline(data_id_as_factor, x = "Week", y = "Score", color = "Id", shape = "Id") + facet_wrap(~Group) + theme(legend.position = "none")
 ```
 ]
----
-
-# Data without experimental outlier 
-.pull-left[
-```{r, echo=FALSE, results=FALSE}
-data_no_outlier <- data %>% filter(Id !=5)
-```
-]
-.pull-right[
-```{r, echo=FALSE, fig.width=6,fig.height=4, dev='png', dpi=300}
-#data_no_outlier %>%
-#  ggplot(aes(factor(Week), Score, fill = Group)) + 
-#  geom_boxplot() +
-#  facet_wrap(~Group) +
-#  xlab("Week") +
-#  ylim(0,100)
-
-ggboxplot(data_no_outlier, x = "Week", y = "Score", fill = "Group")
-
-```
-]
-
- <!-- "The impression is that both groups start at similar levels (how does this relate to randomization?), and gradually increase, but that the experimental group climbs faster. In a linear regression model, this corresponds to two separate slopes, which can be captured by an interaction term." -->
 
 ---
 
@@ -170,13 +131,17 @@ ggboxplot(data_no_outlier, x = "Week", y = "Score", fill = "Group")
 
 <!-- Which analysis method did you choose?  -->
 
-- We chose to do a multiple linear regression (as prescribed by the exam)
+We chose multiple linear regression (as prescribed by the exam)
 
-### Why?
-- We have numerical data
-- A linear relationship between x and y
-- Two study groups 
-- Interested in the interaction between week and group
+But we try to understand why: ignore repeated measurements
+
+For choosing the independent variables:
+- Exp and Std groups
+- Rime interval between the initiation of the treatment to the time point that you measure the BI score matters (the longer patients recover, the better they may get)
+
+
+<i>Time is lurking under the surface</i>
+
 
 <!-- Why? (This should be discussed even if the exam prescribes a certain analysis.)  -->
 
@@ -393,7 +358,7 @@ Homogeneity of residuals variance. The residuals are assumed to have a constant 
 
 - Same individual measured at 8 time points (week 0-7)
 
-- Likely to be similar for each individual (serial correlation)
+- Autocorrelation/serial correlation
 
 Serial correlation can be assessed with the Durbin-Watson test; 2=no correlation, below 2=positive correlation, above 2=negative correlation
 
@@ -590,3 +555,55 @@ ggboxplot(data_delta_score, x = "Group", y = "score_difference", fill = "Group")
 ```{r, echo=FALSE}
 # summary(aov(Score ~ Week + Group + Week:Group, data_no_outlier)) ?
 ```
+---
+---
+# Data description 
+
+<!-- How many individuals are there in the data set?  -->
+.pull-left[
+- 8 individuals per group (total n = 16)
+
+- Measured at baseline and for 7 consecutive weeks
+]
+.pull-right[
+```{r, echo=FALSE, results=FALSE}
+data %>% distinct(Id) %>% nrow()
+```
+
+<!-- Summarize the variables using suitable tables and/or diagrams. -->
+
+```{r, echo=FALSE, dev='png', dpi=300, fig.width=6,fig.height=4}
+#data %>%
+#  ggplot(aes(factor(Week), Score, fill = Group)) + 
+#  geom_boxplot() + 
+#  facet_wrap(~Group) +
+#  xlab("Week") +
+#  ylim(0,100)
+
+ggboxplot(data, x = "Week", y = "Score", fill = "Group")
+```
+]
+---
+
+# Data without experimental outlier 
+.pull-left[
+```{r, echo=FALSE, results=FALSE}
+data_no_outlier <- data %>% filter(Id !=5)
+```
+]
+.pull-right[
+```{r, echo=FALSE, fig.width=6,fig.height=4, dev='png', dpi=300}
+#data_no_outlier %>%
+#  ggplot(aes(factor(Week), Score, fill = Group)) + 
+#  geom_boxplot() +
+#  facet_wrap(~Group) +
+#  xlab("Week") +
+#  ylim(0,100)
+
+ggboxplot(data_no_outlier, x = "Week", y = "Score", fill = "Group")
+
+```
+]
+
+ <!-- "The impression is that both groups start at similar levels (how does this relate to randomization?), and gradually increase, but that the experimental group climbs faster. In a linear regression model, this corresponds to two separate slopes, which can be captured by an interaction term." -->
+

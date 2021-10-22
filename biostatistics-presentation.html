@@ -4,7 +4,7 @@
     <title>Problem 2</title>
     <meta charset="utf-8" />
     <meta name="author" content="Felix Lenner, Johnny Pellas &amp; Xue Yu" />
-    <meta name="date" content="2021-10-21" />
+    <meta name="date" content="2021-10-22" />
     <script src="libs/header-attrs/header-attrs.js"></script>
     <link href="libs/remark-css/default.css" rel="stylesheet" />
     <link href="libs/remark-css/default-fonts.css" rel="stylesheet" />
@@ -16,7 +16,7 @@ class: center, middle, inverse, title-slide
 # Problem 2
 ## Group 2B
 ### Felix Lenner, Johnny Pellas &amp; Xue Yu
-### 2021-10-21
+### 2021-10-22
 
 ---
 
@@ -69,33 +69,26 @@ img, video, iframe {
 # Research question 
 
 &lt;b&gt;Objective:&lt;/b&gt; Evaluation of  a new therapy program designed to help patients recover from stroke.
-&lt;br&gt;
-&lt;br&gt;
-&gt; "A &lt;b&gt;randomized trial&lt;/b&gt; evaluated a &lt;b&gt;new therapy program&lt;/b&gt; designed to help patients recover from a stroke, comparing it to a standard program. Patients were &lt;b&gt;evaluated at baseline&lt;/b&gt; (week 0), and for &lt;b&gt;7 consecutive weeks&lt;/b&gt;, using the Barthelindex. This score ranges from 0 to 100, higher scores indicating better functional ability". 
+
+&lt;b&gt;Design:&lt;/b&gt;
+- Randomized trial comparing the new therapy to a standard program.
+- Patients were evaluated at baseline (week 0) and once per week for 7 consecutive weeks with the Barthel index. The higher scores indicating a higher degree of independence.
 
 ---
 # Barthel Index (BI)
 
 ![BI](images/bi.jpg)
 ---
-# Data description 
 
-&lt;!-- How many individuals are there in the data set?  --&gt;
-.pull-left[
-- 8 individuals per group (total n = 16)
-
-- Measured at baseline and for 7 consecutive weeks
-]
-.pull-right[
+# Data description
 
 
-&lt;!-- Summarize the variables using suitable tables and/or diagrams. --&gt;
 
-![](biostatistics-presentation_files/figure-html/unnamed-chunk-3-1.png)&lt;!-- --&gt;
-]
----
-
-# Individual data
+- 8 patients enrolled in each group
+- Longitudinal data
+- Fixed time interval (1 week) between measurements
+- No missing data
+- &lt;/&gt;BUT&lt;/b&gt; one individual which has 100 across all data points..
 
 .pull-left[
 
@@ -105,19 +98,8 @@ img, video, iframe {
 
 &lt;!-- Want to look at patients recovering from stroke, if a patient has 100 the patient is already fully (?) recovered at start and should not be included in this trial?  --&gt;
 .pull-right[
-![](biostatistics-presentation_files/figure-html/unnamed-chunk-4-1.png)&lt;!-- --&gt;
+![](biostatistics-presentation_files/figure-html/unnamed-chunk-3-1.png)&lt;!-- --&gt;
 ]
----
-
-# Data without experimental outlier 
-.pull-left[
-
-]
-.pull-right[
-![](biostatistics-presentation_files/figure-html/unnamed-chunk-6-1.png)&lt;!-- --&gt;
-]
-
- &lt;!-- "The impression is that both groups start at similar levels (how does this relate to randomization?), and gradually increase, but that the experimental group climbs faster. In a linear regression model, this corresponds to two separate slopes, which can be captured by an interaction term." --&gt;
 
 ---
 
@@ -125,13 +107,17 @@ img, video, iframe {
 
 &lt;!-- Which analysis method did you choose?  --&gt;
 
-- We chose to do a multiple linear regression (as prescribed by the exam)
+We chose multiple linear regression (as prescribed by the exam)
 
-### Why?
-- We have numerical data
-- A linear relationship between x and y
-- Two study groups 
-- Interested in the interaction between week and group
+But we try to understand why: ignore repeated measurements
+
+For choosing the independent variables:
+- Exp and Std groups
+- Rime interval between the initiation of the treatment to the time point that you measure the BI score matters (the longer patients recover, the better they may get)
+
+
+&lt;i&gt;Time is lurking under the surface&lt;/i&gt;
+
 
 &lt;!-- Why? (This should be discussed even if the exam prescribes a certain analysis.)  --&gt;
 
@@ -214,7 +200,7 @@ img, video, iframe {
 ]
 
 .pull-right[
-![](biostatistics-presentation_files/figure-html/unnamed-chunk-9-1.png)&lt;!-- --&gt;
+![](biostatistics-presentation_files/figure-html/unnamed-chunk-6-1.png)&lt;!-- --&gt;
 ]
 
 
@@ -255,7 +241,7 @@ summary(model_outlier)
 ]
 
 .pull-right[
-![](biostatistics-presentation_files/figure-html/unnamed-chunk-12-1.png)&lt;!-- --&gt;
+![](biostatistics-presentation_files/figure-html/unnamed-chunk-9-1.png)&lt;!-- --&gt;
 ]
 
 ---
@@ -271,7 +257,7 @@ summary(model_outlier)
 
 ]
 .pull-right[
-![](biostatistics-presentation_files/figure-html/unnamed-chunk-13-1.png)&lt;!-- --&gt;
+![](biostatistics-presentation_files/figure-html/unnamed-chunk-10-1.png)&lt;!-- --&gt;
 
 ```
 ## 
@@ -299,7 +285,7 @@ Normality of residuals. The residual errors are assumed to be normally distribut
 ]
 
 .pull-right[
-![](biostatistics-presentation_files/figure-html/unnamed-chunk-14-1.png)&lt;!-- --&gt;
+![](biostatistics-presentation_files/figure-html/unnamed-chunk-11-1.png)&lt;!-- --&gt;
 ]
 
 ???
@@ -320,7 +306,7 @@ Homogeneity of residuals variance. The residuals are assumed to have a constant 
 
 - Same individual measured at 8 time points (week 0-7)
 
-- Likely to be similar for each individual (serial correlation)
+- Autocorrelation/serial correlation
 
 Serial correlation can be assessed with the Durbin-Watson test; 2=no correlation, below 2=positive correlation, above 2=negative correlation
 
@@ -419,9 +405,38 @@ with the Barthel index in post-stroke patients. Both groups improved over the 7 
 ]
 .pull-left.c[
 
-![](biostatistics-presentation_files/figure-html/unnamed-chunk-17-1.png)&lt;!-- --&gt;
+![](biostatistics-presentation_files/figure-html/unnamed-chunk-14-1.png)&lt;!-- --&gt;
 ]
 
+
+---
+---
+# Data description 
+
+&lt;!-- How many individuals are there in the data set?  --&gt;
+.pull-left[
+- 8 individuals per group (total n = 16)
+
+- Measured at baseline and for 7 consecutive weeks
+]
+.pull-right[
+
+
+&lt;!-- Summarize the variables using suitable tables and/or diagrams. --&gt;
+
+![](biostatistics-presentation_files/figure-html/unnamed-chunk-17-1.png)&lt;!-- --&gt;
+]
+---
+
+# Data without experimental outlier 
+.pull-left[
+
+]
+.pull-right[
+![](biostatistics-presentation_files/figure-html/unnamed-chunk-19-1.png)&lt;!-- --&gt;
+]
+
+ &lt;!-- "The impression is that both groups start at similar levels (how does this relate to randomization?), and gradually increase, but that the experimental group climbs faster. In a linear regression model, this corresponds to two separate slopes, which can be captured by an interaction term." --&gt;
 
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
