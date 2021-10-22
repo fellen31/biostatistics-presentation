@@ -99,15 +99,13 @@ data
 data_no_outlier <- data %>% filter(Id !=5)
 ```
 
+.pull-left[
+
 - 8 patients enrolled in each group
 - Longitudinal data
 - Fixed time interval (1 week) between measurements
 - No missing data
-- </>BUT</b> one individual which has 100 across all data points..
-
-.pull-left[
-
-- One individual in the experimental group with values of 100 across all weeks
+- <b>BUT</b> one individual which has 100 across all data points..
 
 ]
 
@@ -556,7 +554,7 @@ ggboxplot(data_delta_score, x = "Group", y = "score_difference", fill = "Group")
 # summary(aov(Score ~ Week + Group + Week:Group, data_no_outlier)) ?
 ```
 ---
----
+
 # Data description 
 
 <!-- How many individuals are there in the data set?  -->
